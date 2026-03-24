@@ -9,9 +9,7 @@ import {
   Cpu, 
   Layers, 
   Layout, 
-  Github, 
   Linkedin, 
-  Twitter, 
   Sparkles,
   Zap,
   Globe,
@@ -536,7 +534,7 @@ const Work = ({ onProjectClick }: { onProjectClick: (_: Project) => void }) => {
           <div className="max-w-2xl">
             <h2 className="text-5xl md:text-7xl font-serif font-light text-black dark:text-white mb-8 tracking-tight">Selected <br /><span className="text-accent italic">Artifacts</span></h2>
             <p className="text-zinc-500 text-lg leading-relaxed">
-              A curated selection of work focusing on building AI-enabled products, scalable design systems, and strategic product thinking.
+              A curated selection of work showcasing Enterprise SaaS products, scalable design systems, branding and strategic product thinking.
             </p>
           </div>
           <div className="flex items-center gap-4">
@@ -682,14 +680,11 @@ const Footer = () => {
               Let's build <br />
               <span className="text-accent italic">the future.</span>
             </motion.h2>
-            <p className="text-zinc-500 text-xl mb-16 max-w-xl mx-auto">
-              Currently accepting new strategic partnerships and leadership roles.
-            </p>
             <a 
-              href="mailto:hello@nikhannay.com" 
+              href="mailto:nikhannay@gmail.com" 
               className="inline-flex items-center gap-3 px-8 py-4 border border-accent text-accent rounded-full text-xl font-serif font-normal hover:bg-accent hover:text-white transition-all shadow-xl shadow-accent/10 active:scale-95"
             >
-              hello@nikhannay.com
+              Email me
               <ArrowRight className="w-6 h-6" />
             </a>
           </div>
@@ -704,14 +699,8 @@ const Footer = () => {
             </div>
             
             <div className="flex gap-10">
-              <a href="#" className="text-zinc-500 hover:text-black dark:hover:text-white transition-colors flex items-center gap-2 text-sm font-medium">
-                <Twitter className="w-4 h-4" /> Twitter
-              </a>
-              <a href="#" className="text-zinc-500 hover:text-black dark:hover:text-white transition-colors flex items-center gap-2 text-sm font-medium">
+              <a href="https://www.linkedin.com/in/nik-hannay-design/" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-black dark:hover:text-white transition-colors flex items-center gap-2 text-sm font-medium">
                 <Linkedin className="w-4 h-4" /> LinkedIn
-              </a>
-              <a href="#" className="text-zinc-500 hover:text-black dark:hover:text-white transition-colors flex items-center gap-2 text-sm font-medium">
-                <Github className="w-4 h-4" /> GitHub
               </a>
             </div>
 
@@ -857,7 +846,6 @@ export default function App() {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('theme');
       if (saved) return saved;
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     return 'dark';
   });

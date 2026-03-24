@@ -458,7 +458,7 @@ const Work = ({ onProjectClick }: { onProjectClick: (_: Project) => void }) => {
       title: "The Learning Hub",
       category: "Product Design",
       image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613052086-D4L95UKDORG97YBVR61N/image-asset.jpg",
-      tags: ["EdTech", "Product Design", "Mobile"],
+      tags: ["EdTech", "UX", "Mobile"],
       description: "A mobile-ready online learning platform called The Learning Hub, enabling employees to access resources from multiple sources, complete personal capability assessments and connect with mentors within the business.",
       details: [
         { title: "Project Goal", content: "Shift the companies workplace culture towards modern ways of working. Improve visibility of the companies learning offerings and encourage employees to take ownership of their own careers." },

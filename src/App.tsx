@@ -445,7 +445,6 @@ const Work = ({ onProjectClick }: { onProjectClick: (_: Project) => void }) => {
         { title: "Responsibilities", content: "Product Strategy, Brand Identity, UI/UX Design, Design System Architecture, and Front-end Oversight." },
         { title: "Outcome", content: "Launched successfully with 4+ enterprise clients in the first quarter, significantly reducing the time-to-insight for their strategic teams, securing funding for the next phase." }
       ],
-      externalLink: "https://www.nikhannay.com/serendata-insight",
       visuals: [
         {
           type: 'image',
@@ -465,7 +464,6 @@ const Work = ({ onProjectClick }: { onProjectClick: (_: Project) => void }) => {
         { title: "Responsibilities", content: "Lead Designer, Mobile UX Design, Gamification Strategy, and User Research." },
         { title: "Outcome", content: "Completion rates increased by 55% within the first 6 months of rollout, significantly improving the employment offering." }
       ],
-      externalLink: "https://www.nikhannay.com/learning-hub",
       visuals: [
         {
           type: 'image',
@@ -485,7 +483,6 @@ const Work = ({ onProjectClick }: { onProjectClick: (_: Project) => void }) => {
         { title: "Responsibilities", content: "Lead Designer, Brand Strategy, Visual Identity, and Digital Presence." },
         { title: "Outcome", content: "A simplistic combination mark and detailed brand guidelines deck that set the company's vision and overall aesthetic." }
       ],
-      externalLink: "https://www.nikhannay.com/zenith-wellbeing-lounge",
       visuals: [
         {
           type: 'image',
@@ -505,7 +502,6 @@ const Work = ({ onProjectClick }: { onProjectClick: (_: Project) => void }) => {
         { title: "Responsibilities", content: "Lead Designer, Creative Direction, Web Design, and Content Strategy." },
         { title: "Outcome", content: "A fully-responsive website outlining the SaaS products key features, business benefits and providing access to resources." }
       ],
-      externalLink: "https://www.nikhannay.com/digital-platform",
       visuals: [
         {
           type: 'image',

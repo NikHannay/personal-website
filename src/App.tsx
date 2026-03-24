@@ -438,20 +438,15 @@ const Work = ({ onProjectClick }: { onProjectClick: (_: Project) => void }) => {
       title: "Serendata Insight",
       category: "Enterprise SaaS",
       image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773612997494-EMITZN383YFD1ZI1MSN6/image-asset.png",
-      tags: ["SaaS", "Branding", "AI"],
+      tags: ["SaaS", "Strategy", "Branding"],
       description: "Serendata Insight is a comprehensive SaaS platform designed to provide deep analytics and strategic insights for enterprise clients. The project involved creating a cohesive brand identity, mapping complex user flows, and crafting a high-performance UI that handles massive data sets with ease.",
       details: [
-        { title: "Project Goal", content: "To build a robust, AI-enabled SaaS product that simplifies data analysis for non-technical stakeholders while providing advanced tools for data scientists." },
+        { title: "Project Goal", content: "To build a robust, SaaS platform that revolutionises how organisations deliver sustainable change. Automating manual activities, enabling data-driven decision making, whilst strengthening organisations ability to land change efficiently." },
         { title: "Responsibilities", content: "Product Strategy, Brand Identity, UI/UX Design, Design System Architecture, and Front-end Oversight." },
-        { title: "Outcome", content: "Launched successfully with 15+ enterprise clients in the first quarter, significantly reducing the time-to-insight for their strategic teams." }
+        { title: "Outcome", content: "Launched successfully with 4+ enterprise clients in the first quarter, significantly reducing the time-to-insight for their strategic teams, securing funding for the next phase." }
       ],
       externalLink: "https://www.nikhannay.com/serendata-insight",
       visuals: [
-        {
-          type: 'video',
-          url: "https://player.vimeo.com/video/1067984423?h=8f9a7b6c5d&autoplay=1&loop=1&background=1",
-          caption: "Insight Product Walkthrough"
-        },
         {
           type: 'image',
           url: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773612997494-EMITZN383YFD1ZI1MSN6/image-asset.png",
@@ -463,7 +458,7 @@ const Work = ({ onProjectClick }: { onProjectClick: (_: Project) => void }) => {
       title: "The Learning Hub",
       category: "Product Design",
       image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613052086-D4L95UKDORG97YBVR61N/image-asset.jpg",
-      tags: ["EdTech", "UX", "Mobile"],
+      tags: ["EdTech", "Product Design", "Mobile"],
       description: "A mobile-ready online learning platform called The Learning Hub, enabling employees to access resources from multiple sources, complete personal capability assessments and connect with mentors within the business.",
       details: [
         { title: "Project Goal", content: "Shift the companies workplace culture towards modern ways of working. Improve visibility of the companies learning offerings and encourage employees to take ownership of their own careers." },

@@ -812,7 +812,15 @@ const ProjectModal = ({ project, onClose }: { project: Project | null, onClose: 
                   </div>
                 </div>
                 
-
+                <div className="pt-8 border-t border-black/5 dark:border-white/10">
+                  <a 
+                    href={project.externalLink || "#"} 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between group text-black dark:text-white font-medium"
+                  >
+                    View Full Case Study
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </a>
                 </div>
               </div>

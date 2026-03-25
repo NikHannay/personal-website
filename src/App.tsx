@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { motion, useScroll, useTransform, AnimatePresence } from "motion/react";
+import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSpring } from "motion/react";
 import { 
   ArrowRight, 
   Cpu, 
@@ -17,7 +17,10 @@ import {
   X,
   Command,
   Sun,
-  Moon
+  Moon,
+  ChevronLeft,
+  ChevronRight,
+  Quote
 } from "lucide-react";
 import { useRef, useState, useEffect, createContext, useContext } from "react";
 
@@ -53,6 +56,62 @@ interface Project {
 }
 
 // --- Components ---
+
+const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
+  const images = [
+    "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773612997494-EMITZN383YFD1ZI1MSN6/image-asset.png?format=1500w",
+    "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613052086-D4L95UKDORG97YBVR61N/image-asset.jpg?format=1500w",
+    "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613542750-CR6YHJZKYKT8T38PY4Y2/image-asset.png?format=1500w",
+    "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773614988387-QOQYTT9YYGO258UDAM4P/image-asset.png?format=1500w"
+  ];
+
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % images.length);
+    }, 800);
+
+    const timer = setTimeout(() => {
+      onComplete();
+    }, 3500);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timer);
+    };
+  }, [onComplete, images.length]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } }}
+      className="fixed inset-0 z-[200] bg-white dark:bg-black flex items-center justify-center overflow-hidden"
+    >
+      <div className="relative w-full max-w-2xl aspect-video px-6">
+        <AnimatePresence mode="popLayout">
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, scale: 1.05, filter: "blur(10px)" }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute inset-0 flex items-center justify-center p-6"
+          >
+            <div className="w-full h-full rounded-3xl overflow-hidden border border-black/5 dark:border-white/10 shadow-2xl">
+              <img 
+                src={images[index]} 
+                alt="Loading Artifact" 
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </motion.div>
+  );
+};
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -207,7 +266,15 @@ const BrandLogo = ({ name, domain, simpleSlug, className = "h-8", initialSrc }: 
 };
 
 const Hero = () => {
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { theme } = useTheme();
+  
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  
+  const springX = useSpring(mouseX, { stiffness: 100, damping: 25 });
+  const springY = useSpring(mouseY, { stiffness: 100, damping: 25 });
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"]
@@ -216,18 +283,85 @@ const Hero = () => {
   const y = useTransform(scrollYProgress, [0, 1], [0, 200]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      mouseX.set(e.clientX - rect.left);
+      mouseY.set(e.clientY - rect.top);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [mouseX, mouseY]);
+
   return (
-    <section ref={containerRef} className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-10 overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 -z-10">
+    <section ref={containerRef} className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-10 overflow-hidden bg-white dark:bg-black">
+      {/* Background Gradients */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-600/10 dark:bg-indigo-600/10 blur-[140px] rounded-full" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-emerald-600/10 dark:bg-emerald-600/10 blur-[140px] rounded-full" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.03)_1px,transparent_1px)] dark:bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.03)_1px,transparent_1px)] dark:bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
+      </div>
+
+      {/* Interactive Ripple Blob */}
+      <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
+        {/* The main glow */}
+        <motion.div 
+          className="absolute w-[600px] h-[600px] rounded-full blur-[100px]"
+          style={{ 
+            x: springX, 
+            y: springY,
+            left: -300,
+            top: -300,
+            background: theme === 'dark' 
+              ? 'radial-gradient(circle, rgba(255, 99, 33, 0.3) 0%, transparent 70%)' 
+              : 'radial-gradient(circle, rgba(255, 99, 33, 0.2) 0%, transparent 70%)',
+          }}
+        />
+
+        {/* Ripple Rings */}
+        {[0, 1, 2].map((i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full border border-accent/30 dark:border-accent/40"
+            style={{
+              x: springX,
+              y: springY,
+              left: 0,
+              top: 0,
+              translateX: "-50%",
+              translateY: "-50%",
+            }}
+            animate={{
+              width: [0, 600],
+              height: [0, 600],
+              opacity: [0.6, 0],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              delay: i * 1.3,
+              ease: "easeOut",
+            }}
+          />
+        ))}
+
+        {/* Cursor Core */}
+        <motion.div 
+          className="absolute w-2 h-2 rounded-full bg-accent shadow-[0_0_15px_rgba(255,99,33,0.8)]"
+          style={{ 
+            x: springX, 
+            y: springY,
+            left: -4,
+            top: -4,
+          }}
+        />
       </div>
 
       <motion.div 
         style={{ y, opacity }}
-        className="max-w-5xl mx-auto px-6 text-center"
+        className="max-w-5xl mx-auto px-6 text-center relative z-20"
       >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -291,7 +425,18 @@ const Hero = () => {
         </motion.div>
       </motion.div>
 
-      
+      {/* Floating UI Elements (Linear influence) */}
+      <div className="absolute bottom-10 left-10 hidden xl:block">
+        <div className="p-4 rounded-xl border border-black/5 dark:border-white/5 bg-white/40 dark:bg-black/40 backdrop-blur-md flex items-center gap-4">
+          <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+            <Command className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
+          </div>
+          <div>
+            <p className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Shortcut</p>
+            <p className="text-xs text-zinc-600 dark:text-zinc-200">Press <kbd className="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded border border-black/10 dark:border-white/10">K</kbd> for menu</p>
+          </div>
+        </div>
+      </div>
     </section>
   );
 };
@@ -333,7 +478,7 @@ const FeatureSection = () => {
   ];
 
   return (
-    <section ref={sectionRef} className="pt-0 pb-40 bg-white dark:bg-black relative z-10">
+    <section ref={sectionRef} className="pt-0 pb-20 bg-white dark:bg-black relative z-10">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div 
           style={{ y }}
@@ -421,23 +566,29 @@ const ProjectCard = ({ title, category, image, tags, onClick, index }: { title: 
   );
 };
 
-const Work = ({ onProjectClick }: { onProjectClick: (_: Project) => void }) => {
+const Work = ({ onProjectClick }: { onProjectClick: (p: Project) => void }) => {
   const projects: Project[] = [
     {
       title: "Serendata Insight",
       category: "Enterprise SaaS",
-      image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773612997494-EMITZN383YFD1ZI1MSN6/image-asset.png",
-      tags: ["SaaS", "Strategy", "Branding"],
+      image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773612997494-EMITZN383YFD1ZI1MSN6/image-asset.png?format=1500w",
+      tags: ["SaaS", "Branding", "AI"],
       description: "Serendata Insight is a comprehensive SaaS platform designed to provide deep analytics and strategic insights for enterprise clients. The project involved creating a cohesive brand identity, mapping complex user flows, and crafting a high-performance UI that handles massive data sets with ease.",
       details: [
-        { title: "Project Goal", content: "To build a robust, SaaS platform that revolutionises how organisations deliver sustainable change. Automating manual activities, enabling data-driven decision making, whilst strengthening organisations ability to land change efficiently." },
+        { title: "Project Goal", content: "To build a robust, AI-enabled SaaS product that simplifies data analysis for non-technical stakeholders while providing advanced tools for data scientists." },
         { title: "Responsibilities", content: "Product Strategy, Brand Identity, UI/UX Design, Design System Architecture, and Front-end Oversight." },
-        { title: "Outcome", content: "Launched successfully with 4+ enterprise clients in the first quarter, significantly reducing the time-to-insight for their strategic teams, securing funding for the next phase." }
+        { title: "Outcome", content: "Launched successfully with 15+ enterprise clients in the first quarter, significantly reducing the time-to-insight for their strategic teams." }
       ],
+      externalLink: "https://www.nikhannay.com/serendata-insight",
       visuals: [
         {
+          type: 'video',
+          url: "https://player.vimeo.com/video/1067984423?h=8f9a7b6c5d&autoplay=1&loop=1&background=1",
+          caption: "Insight Product Walkthrough"
+        },
+        {
           type: 'image',
-          url: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773612997494-EMITZN383YFD1ZI1MSN6/image-asset.png",
+          url: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773612997494-EMITZN383YFD1ZI1MSN6/image-asset.png?format=1500w",
           caption: "Dashboard Overview & Data Visualization"
         }
       ]
@@ -445,7 +596,7 @@ const Work = ({ onProjectClick }: { onProjectClick: (_: Project) => void }) => {
     {
       title: "The Learning Hub",
       category: "Product Design",
-      image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613052086-D4L95UKDORG97YBVR61N/image-asset.jpg",
+      image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613052086-D4L95UKDORG97YBVR61N/image-asset.jpg?format=1500w",
       tags: ["EdTech", "UX", "Mobile"],
       description: "A mobile-ready online learning platform called The Learning Hub, enabling employees to access resources from multiple sources, complete personal capability assessments and connect with mentors within the business.",
       details: [
@@ -453,10 +604,11 @@ const Work = ({ onProjectClick }: { onProjectClick: (_: Project) => void }) => {
         { title: "Responsibilities", content: "Lead Designer, Mobile UX Design, Gamification Strategy, and User Research." },
         { title: "Outcome", content: "Completion rates increased by 55% within the first 6 months of rollout, significantly improving the employment offering." }
       ],
+      externalLink: "https://www.nikhannay.com/learning-hub",
       visuals: [
         {
           type: 'image',
-          url: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613052086-D4L95UKDORG97YBVR61N/image-asset.jpg",
+          url: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613052086-D4L95UKDORG97YBVR61N/image-asset.jpg?format=1500w",
           caption: "Mobile Interface & Learning Modules"
         }
       ]
@@ -464,7 +616,7 @@ const Work = ({ onProjectClick }: { onProjectClick: (_: Project) => void }) => {
     {
       title: "Zenith Wellbeing",
       category: "Branding",
-      image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613542750-CR6YHJZKYKT8T38PY4Y2/image-asset.png",
+      image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613542750-CR6YHJZKYKT8T38PY4Y2/image-asset.png?format=1500w",
       tags: ["Identity", "Strategy", "Wellness"],
       description: "Develop a clear and distinctive brand identity with brand DNA for Australian wellbeing start-up Zenith. The brand aims to differentiate the business from its competition, representing an unrivalled yet discrete service.",
       details: [
@@ -472,10 +624,11 @@ const Work = ({ onProjectClick }: { onProjectClick: (_: Project) => void }) => {
         { title: "Responsibilities", content: "Lead Designer, Brand Strategy, Visual Identity, and Digital Presence." },
         { title: "Outcome", content: "A simplistic combination mark and detailed brand guidelines deck that set the company's vision and overall aesthetic." }
       ],
+      externalLink: "https://www.nikhannay.com/zenith-wellbeing-lounge",
       visuals: [
         {
           type: 'image',
-          url: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613542750-CR6YHJZKYKT8T38PY4Y2/image-asset.png",
+          url: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613542750-CR6YHJZKYKT8T38PY4Y2/image-asset.png?format=1500w",
           caption: "Zenith Combination Mark & Brand DNA"
         }
       ]
@@ -483,7 +636,7 @@ const Work = ({ onProjectClick }: { onProjectClick: (_: Project) => void }) => {
     {
       title: "Digital Platform",
       category: "Website",
-      image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773614988387-QOQYTT9YYGO258UDAM4P/image-asset.png",
+      image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773614988387-QOQYTT9YYGO258UDAM4P/image-asset.png?format=1500w",
       tags: ["Web", "SaaS", "Product"],
       description: "An easy-to-use Platform to help organisations manage stakeholders, impacts and actions in support of successful, scalable and seamless transformation. The website aimed to showcase the benefits of the Product.",
       details: [
@@ -491,10 +644,11 @@ const Work = ({ onProjectClick }: { onProjectClick: (_: Project) => void }) => {
         { title: "Responsibilities", content: "Lead Designer, Creative Direction, Web Design, and Content Strategy." },
         { title: "Outcome", content: "A fully-responsive website outlining the SaaS products key features, business benefits and providing access to resources." }
       ],
+      externalLink: "https://www.nikhannay.com/digital-platform",
       visuals: [
         {
           type: 'image',
-          url: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773614988387-QOQYTT9YYGO258UDAM4P/image-asset.png",
+          url: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773614988387-QOQYTT9YYGO258UDAM4P/image-asset.png?format=1500w",
           caption: "Platform Marketing Site & Feature Highlights"
         }
       ]
@@ -502,14 +656,14 @@ const Work = ({ onProjectClick }: { onProjectClick: (_: Project) => void }) => {
   ];
 
   return (
-    <section id="work" className="py-40 bg-white dark:bg-black">
+    <section id="work" className="pt-20 pb-40 bg-white dark:bg-black">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-12"
+          className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-12"
         >
           <div className="max-w-2xl">
             <h2 className="text-5xl md:text-7xl font-serif font-light text-black dark:text-white mb-8 tracking-tight">Selected <br /><span className="text-accent italic">Artifacts</span></h2>
@@ -541,7 +695,7 @@ const Work = ({ onProjectClick }: { onProjectClick: (_: Project) => void }) => {
 
 const Experience = () => {
   return (
-    <section id="about" className="py-40 bg-zinc-50 dark:bg-zinc-950 relative overflow-hidden">
+    <section id="about" className="py-20 bg-zinc-50 dark:bg-zinc-950 relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-black/5 dark:via-white/10 to-transparent" />
       <div className="max-w-7xl mx-auto px-6">
         <motion.div 
@@ -639,9 +793,143 @@ const Experience = () => {
   );
 };
 
+const Testimonials = () => {
+  const [current, setCurrent] = useState(0);
+  const testimonials = [
+    {
+      quote: "Nik has the rare combination of strategic clarity and hands-on craft. He leads by example, sets a high bar for quality, and consistently turns complexity into simple, scalable solutions.",
+      author: "Lance Thornswood",
+      role: "Chief Design Officer, National Australia Bank (NAB)",
+      avatar: "https://picsum.photos/seed/lance/100/100"
+    },
+    {
+      quote: "What truly sets Nik apart is his strong leadership skills. He has a unique ability to inspire and motivate the team. He is a great communicator and always ensured that the design team was aligned with the project's objectives.",
+      author: "Anthony Choren",
+      role: "Senior Product Designer, Once For All (OFA)",
+      avatar: "https://picsum.photos/seed/anthony/100/100"
+    }
+  ];
+
+  const next = () => setCurrent((prev) => (prev + 1) % testimonials.length);
+  const prev = () => setCurrent((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+
+  useEffect(() => {
+    const timer = setInterval(next, 8000);
+    return () => clearInterval(timer);
+  }, [current]);
+
+  return (
+    <section className="py-32 bg-white dark:bg-black overflow-hidden border-t border-black/5 dark:border-white/5">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="relative">
+          <div className="relative z-10 max-w-4xl mx-auto text-center">
+            <div className="mb-16">
+              <p className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.4em] mb-4">Testimonials</p>
+              <h2 className="text-3xl font-serif font-light text-black dark:text-white tracking-tight">Voices of <span className="italic">Impact</span></h2>
+            </div>
+
+            <div className="relative flex items-center justify-center min-h-[380px] md:min-h-[320px]">
+              {/* Left Peek Card */}
+              <div className="absolute -left-[45%] md:-left-[60%] w-full opacity-[0.2] dark:opacity-[0.25] scale-[0.94] blur-[2px] pointer-events-none transition-all duration-500">
+                <div className="bg-zinc-100 dark:bg-zinc-800 border border-black/10 dark:border-white/10 rounded-[2rem] p-12 h-[320px]" />
+              </div>
+              
+              {/* Right Peek Card */}
+              <div className="absolute -right-[45%] md:-right-[60%] w-full opacity-[0.2] dark:opacity-[0.25] scale-[0.94] blur-[2px] pointer-events-none transition-all duration-500">
+                <div className="bg-zinc-100 dark:bg-zinc-800 border border-black/10 dark:border-white/10 rounded-[2rem] p-12 h-[320px]" />
+              </div>
+
+              <AnimatePresence initial={false} mode="wait">
+                <motion.div
+                  key={current}
+                  initial={{ opacity: 0, x: 40, rotate: 2, scale: 0.95 }}
+                  animate={{ opacity: 1, x: 0, rotate: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: -40, rotate: -2, scale: 0.95 }}
+                  transition={{ 
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 25,
+                    mass: 0.8
+                  }}
+                  className="bg-zinc-50/50 dark:bg-zinc-900/40 border border-black/10 dark:border-white/10 rounded-[2rem] p-8 md:p-12 relative overflow-hidden backdrop-blur-sm shadow-sm w-full max-w-[720px] min-h-[320px] flex flex-col justify-center"
+                >
+                  <div className="absolute top-8 left-8 opacity-[0.04] dark:opacity-[0.08]">
+                    <Quote className="w-12 h-12 text-black dark:text-white" />
+                  </div>
+                  
+                  <div className="relative z-10">
+                    <p className="text-lg md:text-xl font-serif font-light text-black dark:text-white leading-snug mb-8 italic">
+                      "{testimonials[current].quote}"
+                    </p>
+                    
+                    <div className="flex items-center justify-center gap-4">
+                      <div className="w-10 h-10 rounded-full overflow-hidden border border-black/5 dark:border-white/5 grayscale hover:grayscale-0 transition-all duration-500 shrink-0">
+                        <img 
+                          src={testimonials[current].avatar} 
+                          alt={testimonials[current].author} 
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                      <div className="text-left">
+                        <h4 className="text-base font-serif font-normal text-black dark:text-white leading-tight">{testimonials[current].author}</h4>
+                        <p className="text-[8px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest leading-tight">{testimonials[current].role}</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            <div className="mt-12 flex flex-col items-center gap-8">
+              <div className="flex gap-2">
+                {testimonials.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrent(i)}
+                    className={`h-1 rounded-full overflow-hidden relative transition-all duration-500 ${current === i ? 'w-12 bg-black/5 dark:bg-white/10' : 'w-4 bg-black/5 dark:bg-white/10'}`}
+                    aria-label={`Go to testimonial ${i + 1}`}
+                  >
+                    {current === i && (
+                      <motion.div
+                        key={`progress-${i}`}
+                        initial={{ width: "0%" }}
+                        animate={{ width: "100%" }}
+                        transition={{ duration: 8, ease: "linear" }}
+                        className="absolute inset-0 bg-accent"
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
+              
+              <div className="flex gap-3">
+                <button 
+                  onClick={prev}
+                  className="w-10 h-10 rounded-full border border-black/5 dark:border-white/5 flex items-center justify-center hover:bg-zinc-50 dark:hover:bg-zinc-950 transition-all active:scale-90"
+                  aria-label="Previous testimonial"
+                >
+                  <ChevronLeft className="w-4 h-4 text-zinc-400" />
+                </button>
+                <button 
+                  onClick={next}
+                  className="w-10 h-10 rounded-full border border-black/5 dark:border-white/5 flex items-center justify-center hover:bg-zinc-50 dark:hover:bg-zinc-950 transition-all active:scale-90"
+                  aria-label="Next testimonial"
+                >
+                  <ChevronRight className="w-4 h-4 text-zinc-400" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const Footer = () => {
   return (
-    <footer id="contact" className="py-40 bg-white dark:bg-black relative overflow-hidden">
+    <footer id="contact" className="py-20 bg-white dark:bg-black relative overflow-hidden">
       <div className="absolute bottom-0 right-0 w-[50%] h-[50%] bg-indigo-600/5 dark:bg-indigo-600/5 blur-[120px] rounded-full -z-10" />
       
       <div className="max-w-7xl mx-auto px-6">
@@ -801,7 +1089,17 @@ const ProjectModal = ({ project, onClose }: { project: Project | null, onClose: 
                   </div>
                 </div>
                 
-                
+                <div className="pt-8 border-t border-black/5 dark:border-white/10">
+                  <a 
+                    href={project.externalLink || "#"} 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between group text-black dark:text-white font-medium"
+                  >
+                    View Full Case Study
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -812,6 +1110,7 @@ const ProjectModal = ({ project, onClose }: { project: Project | null, onClose: 
 };
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('theme');
@@ -848,9 +1147,12 @@ export default function App() {
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      <AnimatePresence mode="wait">
+        {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
+      </AnimatePresence>
+
       <div className={`min-h-screen bg-white dark:bg-black text-zinc-600 dark:text-zinc-200 selection:bg-accent selection:text-white font-sans antialiased transition-colors duration-500`}>
         {/* Custom Cursor or Grid Overlay could go here */}
-        <div className="fixed inset-0 pointer-events-none z-50 border-[20px] border-white dark:border-black hidden lg:block transition-colors duration-500" />
         
         <Navbar />
         <main>
@@ -858,6 +1160,7 @@ export default function App() {
           <FeatureSection />
           <Work onProjectClick={setSelectedProject} />
           <Experience />
+          <Testimonials />
         </main>
         <Footer />
 

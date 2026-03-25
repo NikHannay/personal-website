@@ -425,6 +425,19 @@ const Hero = () => {
         </motion.div>
       </motion.div>
 
+      {/* Floating UI Elements (Linear influence) */}
+      <div className="absolute bottom-10 left-10 hidden xl:block">
+        <div className="p-4 rounded-xl border border-black/5 dark:border-white/5 bg-white/40 dark:bg-black/40 backdrop-blur-md flex items-center gap-4">
+          <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+            <Command className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
+          </div>
+          <div>
+            <p className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Shortcut</p>
+            <p className="text-xs text-zinc-600 dark:text-zinc-200">Press <kbd className="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded border border-black/10 dark:border-white/10">K</kbd> for menu</p>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 };
 

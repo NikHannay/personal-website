@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { Analytics } from "@vercel/analytics/next"
+
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSpring } from "motion/react";
 import { 
   ArrowRight, 

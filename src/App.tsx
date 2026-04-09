@@ -23,6 +23,7 @@ import {
   Quote
 } from "lucide-react";
 import { useRef, useState, useEffect, createContext, useContext } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 // --- Theme Context ---
 const ThemeContext = createContext<{ theme: string; toggleTheme: () => void }>({
@@ -1162,6 +1163,7 @@ export default function App() {
           )}
         </AnimatePresence>
       </div>
+      <Analytics />
     </ThemeContext.Provider>
   );
 }

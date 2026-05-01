@@ -374,8 +374,8 @@ const Hero = () => {
           </div>
           
           <h1 className="text-6xl md:text-8xl lg:text-9xl font-serif font-light tracking-tight text-black dark:text-white mb-10 leading-[0.9] text-balance">
-            Design <br />
-            <span className="text-accent italic">Leader</span>
+            Designing for the AI Era, <br />
+            <span className="text-accent italic">at Scale.</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-zinc-600 dark:text-zinc-400 max-w-3xl mx-auto mb-14 leading-relaxed font-light">

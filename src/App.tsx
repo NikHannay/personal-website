@@ -370,7 +370,7 @@ const Hero = () => {
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-[11px] font-mono uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 mb-10">
             <Sparkles className="w-3 h-3 text-accent" />
-            Redefining the digital craft
+            Design at enterprise scale
           </div>
           
           <h1 className="text-6xl md:text-8xl lg:text-9xl font-serif font-light tracking-tight text-black dark:text-white mb-10 leading-[0.9] text-balance">

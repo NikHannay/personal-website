@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/** 
+ * Nik Hannay - Portfolio 
+ * Entry Point
+ */
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSpring } from "motion/react";
 import { 
   ArrowRight, 
@@ -15,7 +19,6 @@ import {
   Globe,
   Menu,
   X,
-  Command,
   Sun,
   Moon,
   ChevronLeft,
@@ -23,6 +26,9 @@ import {
   Quote
 } from "lucide-react";
 import { useRef, useState, useEffect, createContext, useContext } from "react";
+
+import { MeshGradient } from "@paper-design/shaders-react";
+import { LiquidMetalButton } from "./components/LiquidMetalButton";
 
 // --- Theme Context ---
 const ThemeContext = createContext<{ theme: string; toggleTheme: () => void }>({
@@ -246,13 +252,13 @@ const BrandLogo = ({ name, domain, simpleSlug, className = "h-8", initialSrc }: 
         <img 
           src={src} 
           alt={name} 
-          className={`${className} w-auto object-contain grayscale transition-all duration-700 group-hover:grayscale-0 ${loaded ? 'opacity-40 group-hover:opacity-100' : 'opacity-0'}`} 
+          className={`${className} w-auto object-contain grayscale-[50%] transition-all duration-700 group-hover:grayscale-0 ${loaded ? 'opacity-60 group-hover:opacity-100' : 'opacity-0'}`} 
           onLoad={() => setLoaded(true)}
           onError={handleError}
           referrerPolicy="no-referrer"
         />
       ) : (
-        <span className="text-[10px] font-mono font-bold text-zinc-300 dark:text-zinc-700 uppercase tracking-[0.3em] opacity-40 group-hover:opacity-100 transition-opacity">
+        <span className="text-[10px] font-mono font-bold text-zinc-400 dark:text-zinc-600 uppercase tracking-[0.3em] opacity-60 group-hover:opacity-100 transition-opacity">
           {name}
         </span>
       )}
@@ -369,12 +375,11 @@ const Hero = () => {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-[11px] font-mono uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 mb-10">
-            
             Design at enterprise scale
           </div>
           
-          <h1 className="text-6xl md:text-8xl lg:text-9xl font-serif font-light tracking-tight text-black dark:text-white mb-10 leading-[0.9] text-balance">
-            Systems Thinker.<br />
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-light tracking-tight text-black dark:text-white mb-10 leading-[0.9] text-balance">
+            Systems Thinker. <br />
             <span className="text-accent italic">Design Leader.</span>
           </h1>
           
@@ -383,13 +388,10 @@ const Hero = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-8">
-            <a 
-              href="#work"
-              className="w-full sm:w-auto px-7 py-3.5 border border-accent text-accent rounded-full font-medium flex items-center justify-center gap-3 hover:bg-accent hover:text-white transition-all group shadow-xl shadow-accent/10"
-            >
+            <LiquidMetalButton href="#work" className="text-lg tracking-tight">
               Explore Projects
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </a>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </LiquidMetalButton>
             <div className="flex items-center gap-4 text-zinc-400 dark:text-zinc-500 font-mono text-xs uppercase tracking-widest">
               <span>Scroll to explore</span>
               <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-800" />
@@ -425,13 +427,32 @@ const Hero = () => {
         </motion.div>
       </motion.div>
 
-      
     </section>
   );
 };
 
 const FeatureSection = () => {
   const sectionRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    if (containerRef.current) {
+      const { width, height } = containerRef.current.getBoundingClientRect();
+      setDimensions({ width, height });
+    }
+    
+    const handleResize = () => {
+      if (containerRef.current) {
+        const { width, height } = containerRef.current.getBoundingClientRect();
+        setDimensions({ width, height });
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"]
@@ -467,17 +488,44 @@ const FeatureSection = () => {
   ];
 
   return (
-    <section ref={sectionRef} className="pt-0 pb-20 bg-white dark:bg-black relative z-10">
+    <section ref={sectionRef} className="pt-0 pb-20 relative z-10">
+      {/* Progressive blur transition to soften the line as it covers the hero logos */}
+      <div className="absolute top-0 left-0 right-0 h-48 -translate-y-full pointer-events-none z-20">
+        <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-black via-white/50 dark:via-black/50 to-transparent" />
+        <div className="absolute inset-0 backdrop-blur-xl [mask-image:linear-gradient(to_top,black,transparent)]" />
+      </div>
+      <div className="absolute inset-0 bg-white dark:bg-black -z-10" />
+
       <div className="max-w-7xl mx-auto px-6">
         <motion.div 
+          ref={containerRef}
           style={{ y }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10 rounded-3xl overflow-hidden shadow-sm"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10 rounded-3xl overflow-hidden shadow-sm relative"
         >
+          {/* Mesh Gradient Background */}
+          <div className="absolute inset-0 z-0">
+            {dimensions.width > 0 && dimensions.height > 0 && (
+              <MeshGradient
+                width={dimensions.width}
+                height={dimensions.height}
+                colors={["#cccccc", "#000000", "#ff621f"]}
+                distortion={0.8}
+                swirl={0.1}
+                grainMixer={0}
+                grainOverlay={0}
+                speed={1}
+              />
+            )}
+          </div>
+          
+          {/* 30% Black Overlay - Reduced to make the mesh gradient pop */}
+          <div className="absolute inset-0 z-10 bg-black/30 pointer-events-none" />
+
           {features.map((f, i) => (
             <motion.div 
               key={i} 
               whileHover="hover"
-              className="p-10 bg-white dark:bg-black hover:bg-zinc-50 dark:hover:bg-zinc-950 transition-colors group relative"
+              className="p-10 bg-white/70 dark:bg-black/70 hover:bg-zinc-50/80 dark:hover:bg-zinc-950/80 backdrop-blur-[2px] transition-colors group relative z-20"
             >
               <motion.div 
                 variants={{
@@ -526,16 +574,16 @@ const ProjectCard = ({ title, category, image, tags, onClick, index }: { title: 
       className="group cursor-pointer"
       onClick={onClick}
     >
-    <div className="relative aspect-[16/10] rounded-2xl overflow-hidden border border-black/5 dark:border-white/10 bg-zinc-100 dark:bg-zinc-900 mb-6 shadow-sm group-hover:shadow-2xl transition-shadow duration-500">
+    <div className="relative aspect-[16/10] rounded-2xl overflow-hidden border border-black/5 dark:border-white/10 bg-zinc-100 dark:bg-zinc-900 mb-6 shadow-sm hover:shadow-xl transition-all duration-700 ease-[0.16, 1, 0.3, 1]">
       <img 
         src={image} 
         alt={title}
-        className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:opacity-80"
+        className="w-full h-full object-cover transition-transform duration-1000 ease-[0.16, 1, 0.3, 1] group-hover:scale-110 group-hover:opacity-90"
         referrerPolicy="no-referrer"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
-        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-xl">
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-in-out" />
+      <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-700 ease-[0.16, 1, 0.3, 1] translate-y-2 group-hover:translate-y-0 scale-90 group-hover:scale-100">
+        <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-2xl backdrop-blur-sm">
           <ArrowRight className="w-5 h-5 text-black -rotate-45" />
         </div>
       </div>
@@ -555,7 +603,7 @@ const ProjectCard = ({ title, category, image, tags, onClick, index }: { title: 
   );
 };
 
-const Work = ({ onProjectClick }: { onProjectClick: (p: Project) => void }) => {
+const Work = ({ onProjectClick }: { onProjectClick: (project: Project) => void }) => {
   const projects: Project[] = [
     {
       title: "Serendata Insight",
@@ -645,7 +693,7 @@ const Work = ({ onProjectClick }: { onProjectClick: (p: Project) => void }) => {
   ];
 
   return (
-    <section id="work" className="pt-20 pb-40 bg-white dark:bg-black">
+    <section id="work" className="pt-10 pb-40 bg-white dark:bg-black">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
@@ -655,7 +703,7 @@ const Work = ({ onProjectClick }: { onProjectClick: (p: Project) => void }) => {
           className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-12"
         >
           <div className="max-w-2xl">
-            <h2 className="text-5xl md:text-7xl font-serif font-light text-black dark:text-white mb-8 tracking-tight">Selected <br /><span className="text-accent italic">Artifacts</span></h2>
+            <h2 className="text-5xl md:text-7xl font-serif font-light text-black dark:text-white mb-8 tracking-tight">Selected <br /><span className="text-accent italic">Artefacts</span></h2>
             <p className="text-zinc-500 text-lg leading-relaxed">
               A curated selection of work showcasing Enterprise SaaS products, scalable design systems, branding and strategic product thinking.
             </p>
@@ -893,20 +941,20 @@ const Testimonials = () => {
               </div>
               
               <div className="flex gap-3">
-                <button 
+                <LiquidMetalButton 
                   onClick={prev}
-                  className="w-10 h-10 rounded-full border border-black/5 dark:border-white/5 flex items-center justify-center hover:bg-zinc-50 dark:hover:bg-zinc-950 transition-all active:scale-90"
+                  className="w-10 h-10 px-0 py-0 rounded-full flex items-center justify-center border-black/5 dark:border-white/5"
                   aria-label="Previous testimonial"
                 >
                   <ChevronLeft className="w-4 h-4 text-zinc-400" />
-                </button>
-                <button 
+                </LiquidMetalButton>
+                <LiquidMetalButton 
                   onClick={next}
-                  className="w-10 h-10 rounded-full border border-black/5 dark:border-white/5 flex items-center justify-center hover:bg-zinc-50 dark:hover:bg-zinc-950 transition-all active:scale-90"
+                  className="w-10 h-10 px-0 py-0 rounded-full flex items-center justify-center border-black/5 dark:border-white/5"
                   aria-label="Next testimonial"
                 >
                   <ChevronRight className="w-4 h-4 text-zinc-400" />
-                </button>
+                </LiquidMetalButton>
               </div>
             </div>
           </div>
@@ -932,18 +980,15 @@ const Footer = () => {
             <motion.h2 
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              className="text-6xl md:text-8xl lg:text-9xl font-serif font-light text-black dark:text-white mb-12 tracking-tighter"
+              className="text-5xl md:text-7xl lg:text-8xl font-serif font-light tracking-tight text-black dark:text-white mb-12 leading-[0.9] text-balance"
             >
               Let's build <br />
               <span className="text-accent italic">the future.</span>
             </motion.h2>
-            <a 
-              href="mailto:nikhannay@gmail.com" 
-              className="inline-flex items-center gap-3 px-8 py-4 border border-accent text-accent rounded-full text-xl font-serif font-normal hover:bg-accent hover:text-white transition-all shadow-xl shadow-accent/10 active:scale-95"
-            >
+            <LiquidMetalButton href="mailto:nikhannay@gmail.com" className="text-xl font-normal">
               Email me
-              <ArrowRight className="w-6 h-6" />
-            </a>
+              <ArrowRight className="w-7 h-7" />
+            </LiquidMetalButton>
           </div>
 
           <div className="pt-20 border-t border-black/5 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-10">

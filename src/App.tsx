@@ -435,13 +435,29 @@ const FeatureSection = () => {
   const sectionRef = useRef(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const [isInView, setIsInView] = useState(false);
 
   useEffect(() => {
+    // Reduced motion check
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setIsReducedMotion(mediaQuery.matches);
+    const handler = (e: MediaQueryListEvent) => setIsReducedMotion(e.matches);
+    mediaQuery.addEventListener("change", handler);
+
+    // Initial dimensions
     if (containerRef.current) {
       const { width, height } = containerRef.current.getBoundingClientRect();
       setDimensions({ width, height });
     }
     
+    // Intersection observer for pausing animation
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    if (containerRef.current) observer.observe(containerRef.current);
+
     const handleResize = () => {
       if (containerRef.current) {
         const { width, height } = containerRef.current.getBoundingClientRect();
@@ -450,7 +466,11 @@ const FeatureSection = () => {
     };
 
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      mediaQuery.removeEventListener("change", handler);
+      observer.disconnect();
+    };
   }, []);
 
   const { scrollYProgress } = useScroll({
@@ -513,7 +533,7 @@ const FeatureSection = () => {
                 swirl={0.1}
                 grainMixer={0}
                 grainOverlay={0}
-                speed={1}
+                speed={isReducedMotion || !isInView ? 0 : 1}
               />
             )}
           </div>
@@ -941,20 +961,20 @@ const Testimonials = () => {
               </div>
               
               <div className="flex gap-3">
-                <LiquidMetalButton 
+                <button 
                   onClick={prev}
-                  className="w-10 h-10 px-0 py-0 rounded-full flex items-center justify-center border-black/5 dark:border-white/5"
+                  className="group w-10 h-10 rounded-full flex items-center justify-center border border-accent text-accent hover:bg-accent hover:text-white transition-all active:scale-95 shadow-lg shadow-accent/10"
                   aria-label="Previous testimonial"
                 >
-                  <ChevronLeft className="w-4 h-4 text-zinc-400" />
-                </LiquidMetalButton>
-                <LiquidMetalButton 
+                  <ChevronLeft className="w-4 h-4 transition-colors" />
+                </button>
+                <button 
                   onClick={next}
-                  className="w-10 h-10 px-0 py-0 rounded-full flex items-center justify-center border-black/5 dark:border-white/5"
+                  className="group w-10 h-10 rounded-full flex items-center justify-center border border-accent text-accent hover:bg-accent hover:text-white transition-all active:scale-95 shadow-lg shadow-accent/10"
                   aria-label="Next testimonial"
                 >
-                  <ChevronRight className="w-4 h-4 text-zinc-400" />
-                </LiquidMetalButton>
+                  <ChevronRight className="w-4 h-4 transition-colors" />
+                </button>
               </div>
             </div>
           </div>

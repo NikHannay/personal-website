@@ -769,7 +769,7 @@ const Experience = () => {
                 I lead design at the intersection of <span className="text-black dark:text-white font-normal">product, systems, and AI</span>, building teams, platforms, and experiences that scale.
               </p>
               <p>
-                I’ve grown design functions from <span className="text-black dark:text-white font-normal">0→12</span>, defined product strategy alongside executive leadership, and delivered products that have scaled to enterprise adoption and successful exit.
+                I've built design functions from the ground up, helped scale organisations to 250+ designers, and delivered products that have reached enterprise adoption and successful exit.
               </p>
               <p>
                 My focus is creating the conditions for teams to do their best work through strong systems, clear direction, and a deep understanding of how design drives business outcomes.

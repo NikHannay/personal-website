@@ -42,6 +42,7 @@ const useTheme = () => useContext(ThemeContext);
 interface ProjectDetail {
   title: string;
   content: string;
+  visuals?: ProjectVisual[];
 }
 
 interface ProjectVisual {
@@ -59,6 +60,12 @@ interface Project {
   details: ProjectDetail[];
   visuals?: ProjectVisual[];
   externalLink?: string;
+  pullQuote?: string;
+  attribution?: {
+    text: string;
+    link: string;
+    linkText: string;
+  };
 }
 
 // --- Components ---
@@ -623,8 +630,93 @@ const ProjectCard = ({ title, category, image, tags, onClick, index }: { title: 
   );
 };
 
-const Work = ({ onProjectClick }: { onProjectClick: (project: Project) => void }) => {
+const Work = ({ onProjectClick }: { onProjectClick: (_p: Project) => void }) => {
   const projects: Project[] = [
+    {
+      title: "NAB: Unifying design at enterprise scale",
+      category: "Design System",
+      image: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/Elevate%20design%20system.jpeg",
+      tags: ["Design Systems", "Enterprise"],
+      description: "Design Director · National Australia Bank · Digital, Data & AI\n\nWhen I joined the Elevate design system program at NAB, the scale of the problem was immediately clear. Across one of Australia's largest banks, serving 8.5 million customers, product teams had been solving the same design problems independently for years. The result was 65 distinct onboarding pathways, several component libraries (some nearly a decade old), and a design environment where a single change to a progress indicator could take days to resolve across dozens of files. Inconsistency wasn't just a craft problem. In a regulated financial environment, it was a compliance risk.\n\nThe strategic directive from our Chief Design Officer was simple: one way to do any one thing. My role was to make that real.",
+      details: [
+        { 
+          title: "Building Elevate", 
+          content: "The system we created, Elevate, is built on Figma Enterprise and extends Brad Frost's atomic design methodology with a layer of fully-composed, logic-bearing components we call 'machines'. Each machine encodes every state, validation rule, error path, and responsive behaviour its context requires. Teams drop them into any product flow without rebuilding from scratch. The distinction matters: these aren't static pattern library entries. They're functional design units that carry intent. Governance was built into the architecture from the start. Published libraries mean a core component update propagates instantly to every consuming file.",
+          visuals: [
+            {
+              type: 'video',
+              url: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/NAB%20machines%20in%20action_1080p.mp4",
+              caption: "Architecture: The evolution from Shells to Machines to Molecules"
+            },
+            {
+              type: 'video',
+              url: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/NAB%20reusable%20components_1080p.mp4",
+              caption: "The core Elevate design system component library"
+            }
+          ]
+        },
+        { 
+          title: "Theming at scale", 
+          content: "One of the more complex challenges was supporting NAB's white-label portfolio including Kogan Money, Qantas Money, and Bank of Queensland without duplicating work across teams. Figma Variables solved this cleanly. Each machine reads a small set of tokens for colour, typography, and corner radii. Switching brands is a token swap. What previously took weeks of bespoke design work now takes hours, and every white-label product stays in sync with the parent system automatically.",
+          visuals: [
+            {
+              type: 'image',
+              url: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/White-label%20brands.jpg",
+              caption: "Multi-brand scaling: White-labeling via token-driven Figma Variables"
+            },
+            {
+              type: 'video',
+              url: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/NAB%20token%20swap%20and%20themeing_1080p.mp4",
+              caption: "Tokens in action: Real-time brand switching across the portfolio"
+            }
+          ]
+        },
+        { 
+          title: "Closing the handoff gap", 
+          content: "Before Elevate, design-to-development handoff was manual and lossy: files attached to emails, specs maintained separately, and roughly half of our team's capacity spent checking builds against designs rather than advancing them. With Figma as a single end-to-end flows file, up to 80 people now work in context simultaneously. Developers inspect spacing, tokens, and component properties directly in Dev Mode and copy code-ready values without a meeting.",
+          visuals: [
+            {
+              type: 'image',
+              url: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/Dev%20Mode%20screen.jpeg",
+              caption: "Developer inspection: Bridging the gap with logic-bearing components in Figma"
+            },
+            {
+              type: 'image',
+              url: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/Dev%20Mode%20spacing.jpg",
+              caption: "Precision handoff: Token-driven spacing and layout inspection"
+            }
+          ]
+        },
+        { 
+          title: "Outcomes", 
+          content: "The redesigned onboarding experience delivered measurable results for customers and teams alike. Sign-up time dropped by 50%. Form fields were reduced by 70%, removing friction at the most critical point in the customer relationship. In the first year, Elevate's libraries were used over 100,000 times across NAB: each reuse a designer-day redirected toward harder, more valuable problems. Over 200 designers now work from a single system.",
+          visuals: [
+            {
+              type: 'video',
+              url: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/NAB%20homepage_1080p.mp4",
+              caption: "The unified onboarding experience in action"
+            }
+          ]
+        },
+        { 
+          title: "What's next", 
+          content: "Elevate is not a finished artefact, it's an evolving capability. Code Connect and Figma MCP are now integrated, connecting design tokens directly into engineering workflows and significantly reducing the back-and-forth between disciplines. The next frontier is agentic workflows: using AI to automate repeatable design and delivery tasks, reduce manual overhead across the system, and free the team to focus on higher-order problems.",
+          visuals: [
+            {
+              type: 'image',
+              url: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/Elevate%20design%20system.jpeg",
+              caption: "The roadmap for Elevate: From design system to design platform"
+            }
+          ]
+        }
+      ],
+      pullQuote: "Figma provides us with a single canvas for collaboration, ensuring design intent is communicated accurately and enhancing the quality of our handover experience. It also enables us to visually showcase the value design provides to the broader business.",
+      attribution: {
+        text: "This work was featured by Figma as a customer story.",
+        link: "https://www.figma.com/customers/design-once-reuse-everywhere-how-nab-unified-design-at-enterprise-scale-with-figma/",
+        linkText: "Read the original article"
+      }
+    },
     {
       title: "Serendata Insight",
       category: "Enterprise SaaS",
@@ -729,13 +821,6 @@ const Work = ({ onProjectClick }: { onProjectClick: (project: Project) => void }
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex -space-x-3">
-              {[1,2,3,4].map(i => (
-                <div key={i} className="w-10 h-10 rounded-full border-2 border-white dark:border-black bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
-                  <img src={`https://picsum.photos/seed/user${i}/100/100`} alt="User" referrerPolicy="no-referrer" />
-                </div>
-              ))}
-            </div>
             <p className="text-xs text-zinc-400 dark:text-zinc-500 font-mono uppercase tracking-widest">Trusted by 50+ teams</p>
           </div>
         </motion.div>
@@ -769,7 +854,7 @@ const Experience = () => {
                 I lead design at the intersection of <span className="text-black dark:text-white font-normal">product, systems, and AI</span>, building teams, platforms, and experiences that scale.
               </p>
               <p>
-                I've built design functions from the ground up, helped scale organisations to 250+ designers, and delivered products that have reached enterprise adoption and successful exit.
+                I've built design functions from the ground up, helped scale organisations to <span className="text-black dark:text-white font-normal">250+ designers</span>, and delivered products that have reached enterprise adoption and successful exit.
               </p>
               <p>
                 My focus is creating the conditions for teams to do their best work through strong systems, clear direction, and a deep understanding of how design drives business outcomes.
@@ -857,13 +942,13 @@ const Testimonials = () => {
       quote: "Nik has the rare combination of strategic clarity and hands-on craft. He leads by example, sets a high bar for quality, and consistently turns complexity into simple, scalable solutions.",
       author: "Lance Thornswood",
       role: "Chief Design Officer, National Australia Bank (NAB)",
-      avatar: "https://picsum.photos/seed/lance/100/100"
+      avatar: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/Lance_T.jpeg"
     },
     {
       quote: "What truly sets Nik apart is his strong leadership skills. He has a unique ability to inspire and motivate the team. He is a great communicator and always ensured that the design team was aligned with the project's objectives.",
       author: "Anthony Choren",
       role: "Senior Product Designer, Once For All (OFA)",
-      avatar: "https://picsum.photos/seed/anthony/100/100"
+      avatar: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/Anthony_C.jpeg"
     }
   ];
 
@@ -882,7 +967,7 @@ const Testimonials = () => {
           <div className="relative z-10 max-w-4xl mx-auto text-center">
             <div className="mb-16">
               <p className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.4em] mb-4">Testimonials</p>
-              <h2 className="text-3xl font-serif font-light text-black dark:text-white tracking-tight">Voices of <span className="italic">Impact</span></h2>
+              <h2 className="text-4xl md:text-6xl font-serif font-light text-black dark:text-white mb-12 tracking-tight">Voices of <span className="italic">Impact</span></h2>
             </div>
 
             <div className="relative flex items-center justify-center min-h-[380px] md:min-h-[320px]">
@@ -915,7 +1000,7 @@ const Testimonials = () => {
                   </div>
                   
                   <div className="relative z-10">
-                    <p className="text-lg md:text-xl font-serif font-light text-black dark:text-white leading-snug mb-8 italic">
+                    <p className="text-lg md:text-xl font-sans text-black dark:text-white leading-snug mb-8 italic">
                       "{testimonials[current].quote}"
                     </p>
                     
@@ -1058,9 +1143,10 @@ const ProjectModal = ({ project, onClose }: { project: Project | null, onClose: 
         <div className="relative">
           <button 
             onClick={onClose}
-            className="absolute top-6 right-6 z-10 w-12 h-12 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/20 transition-colors"
+            className="absolute top-6 right-6 z-20 px-4 py-2 rounded-full bg-white dark:bg-zinc-900 shadow-xl border border-black/10 dark:border-white/10 flex items-center gap-2 hover:scale-105 transition-all group"
           >
-            <X className="w-6 h-6 text-black dark:text-white" />
+            <span className="text-[10px] font-mono font-medium tracking-widest uppercase text-zinc-500 dark:text-zinc-400">Close</span>
+            <X className="w-4 h-4 text-black dark:text-white group-hover:rotate-90 transition-transform duration-300" />
           </button>
           
           <div className="aspect-[21/9] w-full overflow-hidden">
@@ -1077,15 +1163,74 @@ const ProjectModal = ({ project, onClose }: { project: Project | null, onClose: 
               <div className="flex-1">
                 <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-[0.3em] mb-4">{project.category}</p>
                 <h2 className="text-4xl md:text-6xl font-serif font-light text-black dark:text-white mb-8 tracking-tight">{project.title}</h2>
-                <p className="text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed font-light mb-12">
+                <div className="text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed font-light mb-12 whitespace-pre-line">
                   {project.description}
-                </p>
+                </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
+                {project.pullQuote && (
+                  <div className="mb-20 p-8 md:p-12 bg-black/[0.02] dark:bg-white/[0.02] rounded-3xl border-l-4 border-accent relative italic">
+                    <Quote className="absolute top-6 left-6 w-8 h-8 opacity-5" />
+                    <p className="text-xl md:text-2xl font-serif text-black dark:text-white leading-snug">
+                      "{project.pullQuote}"
+                    </p>
+                  </div>
+                )}
+                
+                <div className="flex flex-col gap-12 mb-20">
                   {project.details.map((detail, i) => (
-                    <div key={i}>
-                      <h4 className="text-xs font-mono text-zinc-400 uppercase tracking-widest mb-4">{detail.title}</h4>
-                      <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed">{detail.content}</p>
+                    <div key={i} className="space-y-8">
+                      <div>
+                        <h4 className="text-xs font-mono text-zinc-400 uppercase tracking-widest mb-4">{detail.title}</h4>
+                        <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed text-lg">{detail.content}</p>
+                      </div>
+
+                      {/* Woven Visuals */}
+                      {detail.visuals && detail.visuals.length > 0 && (
+                        <div className="space-y-12 py-4">
+                          {detail.visuals.map((visual, vi) => (
+                            <div key={vi} className="space-y-6">
+                              <div className="rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-900 border border-black/5 dark:border-white/10 shadow-inner">
+                                {visual.type === 'video' ? (
+                                  <div className="aspect-video w-full bg-black">
+                                    {visual.url.includes('vimeo.com') || visual.url.includes('youtube.com') ? (
+                                      <iframe 
+                                        src={visual.url} 
+                                        className="w-full h-full" 
+                                        frameBorder="0" 
+                                        allow="autoplay; fullscreen; picture-in-picture" 
+                                        allowFullScreen
+                                        title={visual.caption}
+                                        loading="lazy"
+                                      />
+                                    ) : (
+                                      <video 
+                                        src={visual.url} 
+                                        className="w-full h-full object-cover" 
+                                        controls 
+                                        muted 
+                                        loop 
+                                        autoPlay 
+                                        playsInline
+                                      />
+                                    )}
+                                  </div>
+                                ) : (
+                                  <img 
+                                    src={visual.url} 
+                                    alt={visual.caption || project.title} 
+                                    className="w-full h-auto block"
+                                    referrerPolicy="no-referrer"
+                                    loading="lazy"
+                                  />
+                                )}
+                              </div>
+                              {visual.caption && (
+                                <p className="text-sm text-zinc-500 italic text-center font-serif tracking-wide">{visual.caption}</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1104,15 +1249,27 @@ const ProjectModal = ({ project, onClose }: { project: Project | null, onClose: 
                         <div className="rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-900 border border-black/5 dark:border-white/10 shadow-inner">
                           {visual.type === 'video' ? (
                             <div className="aspect-video w-full bg-black">
-                              <iframe 
-                                src={visual.url} 
-                                className="w-full h-full" 
-                                frameBorder="0" 
-                                allow="autoplay; fullscreen; picture-in-picture" 
-                                allowFullScreen
-                                title={visual.caption}
-                                loading="lazy"
-                              />
+                              {visual.url.includes('vimeo.com') || visual.url.includes('youtube.com') ? (
+                                <iframe 
+                                  src={visual.url} 
+                                  className="w-full h-full" 
+                                  frameBorder="0" 
+                                  allow="autoplay; fullscreen; picture-in-picture" 
+                                  allowFullScreen
+                                  title={visual.caption}
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <video 
+                                  src={visual.url} 
+                                  className="w-full h-full object-cover" 
+                                  controls 
+                                  muted 
+                                  loop 
+                                  autoPlay 
+                                  playsInline
+                                />
+                              )}
                             </div>
                           ) : (
                             <img 
@@ -1144,15 +1301,32 @@ const ProjectModal = ({ project, onClose }: { project: Project | null, onClose: 
                 </div>
                 
                 <div className="pt-8 border-t border-black/5 dark:border-white/10">
-                  <a 
-                    href={project.externalLink || "#"} 
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between group text-black dark:text-white font-medium"
-                  >
-                    View Full Case Study
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </a>
+                  {project.attribution ? (
+                    <div className="space-y-4">
+                      <p className="text-xs text-zinc-500 italic leading-relaxed">
+                        {project.attribution.text}
+                      </p>
+                      <a 
+                        href={project.attribution.link} 
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between group text-accent font-medium text-sm"
+                      >
+                        {project.attribution.linkText}
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </a>
+                    </div>
+                  ) : (
+                    <a 
+                      href={project.externalLink || "#"} 
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between group text-black dark:text-white font-medium"
+                    >
+                      View Full Case Study
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

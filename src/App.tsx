@@ -67,7 +67,7 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
   const images = [
     "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773612997494-EMITZN383YFD1ZI1MSN6/image-asset.png?format=1500w",
     "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613052086-D4L95UKDORG97YBVR61N/image-asset.jpg?format=1500w",
-    "https://github.com/NikHannay/personal-website/blob/main/src/images/elevate/Elevate%20design%20system.jpeg?format=1500w"
+    "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/Elevate%20design%20system.jpeg",
     "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773614988387-QOQYTT9YYGO258UDAM4P/image-asset.png?format=1500w"
   ];
 

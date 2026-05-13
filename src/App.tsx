@@ -79,8 +79,21 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
   ];
 
   const [index, setIndex] = useState(0);
+  const [preloaded, setPreloaded] = useState(false);
 
   useEffect(() => {
+    Promise.all(images.map(src => {
+      const img = new Image();
+      img.src = src;
+      return new Promise(res => { img.onload = res; img.onerror = res; });
+    })).then(() => {
+      setPreloaded(true);
+    });
+  }, [images]);
+
+  useEffect(() => {
+    if (!preloaded) return;
+
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % images.length);
     }, 800);
@@ -93,7 +106,7 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
       clearInterval(interval);
       clearTimeout(timer);
     };
-  }, [onComplete, images.length]);
+  }, [preloaded, onComplete, images.length]);
 
   return (
     <motion.div
@@ -282,6 +295,12 @@ const Hero = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   
+  // Helper to detect touch devices
+  const isTouchDevice = () => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia("(hover: none)").matches;
+  };
+  
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   
@@ -297,6 +316,8 @@ const Hero = () => {
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   useEffect(() => {
+    if (isTouchDevice()) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
@@ -334,7 +355,7 @@ const Hero = () => {
         />
 
         {/* Ripple Rings */}
-        {[0, 1, 2].map((i) => (
+        {!isTouchDevice() && [0, 1, 2].map((i) => (
           <motion.div
             key={i}
             className="absolute rounded-full border border-accent/30 dark:border-accent/40"
@@ -452,29 +473,24 @@ const FeatureSection = () => {
     const handler = (e: MediaQueryListEvent) => setIsReducedMotion(e.matches);
     mediaQuery.addEventListener("change", handler);
 
-    // Initial dimensions
-    if (containerRef.current) {
-      const { width, height } = containerRef.current.getBoundingClientRect();
+    if (!containerRef.current) return;
+
+    // Replace window resize listener with ResizeObserver
+    const ro = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
       setDimensions({ width, height });
-    }
+    });
+    ro.observe(containerRef.current);
     
-    // Intersection observer for pausing animation
+    // Give IntersectionObserver a rootMargin buffer so it fires before reaching the element
     const observer = new IntersectionObserver(
       ([entry]) => setIsInView(entry.isIntersecting),
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: "200px 0px" }
     );
-    if (containerRef.current) observer.observe(containerRef.current);
+    observer.observe(containerRef.current);
 
-    const handleResize = () => {
-      if (containerRef.current) {
-        const { width, height } = containerRef.current.getBoundingClientRect();
-        setDimensions({ width, height });
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
     return () => {
-      window.removeEventListener("resize", handleResize);
+      ro.disconnect();
       mediaQuery.removeEventListener("change", handler);
       observer.disconnect();
     };
@@ -524,53 +540,58 @@ const FeatureSection = () => {
       <div className="absolute inset-0 bg-white dark:bg-black -z-10" />
 
       <div className="max-w-7xl mx-auto px-6">
+        {/* Decouple the parallax from the shader container */}
         <motion.div 
-          ref={containerRef}
           style={{ y }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10 rounded-3xl overflow-hidden shadow-sm relative"
+          className="relative"
         >
-          {/* Mesh Gradient Background */}
-          <div className="absolute inset-0 z-0">
-            {dimensions.width > 0 && dimensions.height > 0 && (
-              <MeshGradient
-                width={dimensions.width}
-                height={dimensions.height}
-                colors={["#cccccc", "#000000", "#ff621f"]}
-                distortion={0.8}
-                swirl={0.1}
-                grainMixer={0}
-                grainOverlay={0}
-                speed={isReducedMotion || !isInView ? 0 : 1}
-              />
-            )}
-          </div>
-          
-          {/* 30% Black Overlay - Reduced to make the mesh gradient pop */}
-          <div className="absolute inset-0 z-10 bg-black/30 pointer-events-none" />
+          <div 
+            ref={containerRef}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10 rounded-3xl overflow-hidden shadow-sm relative"
+          >
+            {/* Mesh Gradient Background */}
+            <div className="absolute inset-0 z-0">
+              {dimensions.width > 0 && dimensions.height > 0 && (
+                <MeshGradient
+                  width={dimensions.width}
+                  height={dimensions.height}
+                  colors={["#cccccc", "#000000", "#ff621f"]}
+                  distortion={0.8}
+                  swirl={0.1}
+                  grainMixer={0}
+                  grainOverlay={0}
+                  speed={isReducedMotion || !isInView ? 0 : 1}
+                />
+              )}
+            </div>
+            
+            {/* 30% Black Overlay - Reduced to make the mesh gradient pop */}
+            <div className="absolute inset-0 z-10 bg-black/30 pointer-events-none" />
 
-          {features.map((f, i) => (
-            <motion.div 
-              key={i} 
-              whileHover="hover"
-              className="p-10 bg-white/70 dark:bg-black/70 hover:bg-zinc-50/80 dark:hover:bg-zinc-950/80 backdrop-blur-[2px] transition-colors group relative z-20"
-            >
+            {features.map((f, i) => (
               <motion.div 
-                variants={{
-                  hover: { 
-                    scale: 1.2,
-                    y: -4,
-                    transition: { type: "spring", stiffness: 400, damping: 10 }
-                  }
-                }}
-                className={`w-12 h-12 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center mb-8 transition-colors`}
+                key={i} 
+                whileHover="hover"
+                className="p-10 bg-white/70 dark:bg-black/70 hover:bg-zinc-50/80 dark:hover:bg-zinc-950/80 backdrop-blur-[2px] transition-colors group relative z-20"
               >
-                <f.icon className={`w-6 h-6 ${f.color}`} />
+                <motion.div 
+                  variants={{
+                    hover: { 
+                      scale: 1.2,
+                      y: -4,
+                      transition: { type: "spring", stiffness: 400, damping: 10 }
+                    }
+                  }}
+                  className={`w-12 h-12 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center mb-8 transition-colors`}
+                >
+                  <f.icon className={`w-6 h-6 ${f.color}`} />
+                </motion.div>
+                <h3 className="text-2xl font-serif font-normal text-black dark:text-white mb-4">{f.title}</h3>
+                <p className="text-zinc-500 text-sm leading-relaxed">{f.description}</p>
+                <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-black/5 dark:via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               </motion.div>
-              <h3 className="text-2xl font-serif font-normal text-black dark:text-white mb-4">{f.title}</h3>
-              <p className="text-zinc-500 text-sm leading-relaxed">{f.description}</p>
-              <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-black/5 dark:via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            </motion.div>
-          ))}
+            ))}
+          </div>
         </motion.div>
       </div>
     </section>
@@ -580,6 +601,16 @@ const FeatureSection = () => {
 const ProjectCard = ({ title, category, image, tags, onClick, index }: { title: string, category: string, image: string, tags: string[], onClick: () => void, index: number }) => {
   const isLeft = index % 2 === 0;
   const cardRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.matchMedia("(max-width: 768px)").matches);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   const { scrollYProgress } = useScroll({
     target: cardRef,
@@ -587,10 +618,11 @@ const ProjectCard = ({ title, category, image, tags, onClick, index }: { title: 
   });
 
   // Stay centered (at offset) for 70% of the scroll journey, then fan out to 0 in the last 30%
-  const x = useTransform(scrollYProgress, [0, 0.7, 1], [isLeft ? 60 : -60, isLeft ? 60 : -60, 0]);
+  // On mobile, we disable the x and rotate transforms for performance
+  const x = useTransform(scrollYProgress, [0, 0.7, 1], [isMobile ? 0 : (isLeft ? 60 : -60), isMobile ? 0 : (isLeft ? 60 : -60), 0]);
   const opacity = useTransform(scrollYProgress, [0, 0.4, 1], [0, 1, 1]);
   const scale = useTransform(scrollYProgress, [0, 0.7, 1], [0.9, 0.9, 1]);
-  const rotate = useTransform(scrollYProgress, [0, 0.7, 1], [isLeft ? -2 : 2, isLeft ? -2 : 2, 0]);
+  const rotate = useTransform(scrollYProgress, [0, 0.7, 1], [isMobile ? 0 : (isLeft ? -2 : 2), isMobile ? 0 : (isLeft ? -2 : 2), 0]);
   const y = useTransform(scrollYProgress, [0, 1], [100, 0]);
 
   return (

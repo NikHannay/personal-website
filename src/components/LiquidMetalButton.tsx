@@ -25,20 +25,15 @@ export const LiquidMetalButton = ({
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
-    if (containerRef.current) {
-      const { width, height } = containerRef.current.getBoundingClientRect();
-      setDimensions({ width, height });
-    }
-    
-    const handleResize = () => {
-      if (containerRef.current) {
-        const { width, height } = containerRef.current.getBoundingClientRect();
-        setDimensions({ width, height });
-      }
-    };
+    if (!containerRef.current) return;
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    const ro = new ResizeObserver(([entry]) => {
+      const rect = entry.target.getBoundingClientRect();
+      setDimensions({ width: rect.width, height: rect.height });
+    });
+    ro.observe(containerRef.current);
+
+    return () => ro.disconnect();
   }, []);
 
   const buttonContent = (

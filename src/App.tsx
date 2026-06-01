@@ -25,7 +25,7 @@ import {
   ChevronRight,
   Quote
 } from "lucide-react";
-import { useRef, useState, useEffect, createContext, useContext } from "react";
+import { useRef, useState, useEffect, createContext, useContext, useCallback } from "react";
 
 import { MeshGradient } from "@paper-design/shaders-react";
 import { LiquidMetalButton } from "./components/LiquidMetalButton";
@@ -70,32 +70,32 @@ interface Project {
 
 // --- Components ---
 
-const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
-  const images = [
-    "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773612997494-EMITZN383YFD1ZI1MSN6/image-asset.png?format=1500w",
-    "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613052086-D4L95UKDORG97YBVR61N/image-asset.jpg?format=1500w",
-    "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/Elevate%20design%20system.jpeg",
-    "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773614988387-QOQYTT9YYGO258UDAM4P/image-asset.png?format=1500w"
-  ];
+const LOADING_IMAGES = [
+  "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773612997494-EMITZN383YFD1ZI1MSN6/image-asset.png?format=1500w",
+  "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613052086-D4L95UKDORG97YBVR61N/image-asset.jpg?format=1500w",
+  "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/Elevate%20design%20system.jpeg",
+  "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773614988387-QOQYTT9YYGO258UDAM4P/image-asset.png?format=1500w"
+];
 
+const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
   const [index, setIndex] = useState(0);
   const [preloaded, setPreloaded] = useState(false);
 
   useEffect(() => {
-    Promise.all(images.map(src => {
+    Promise.all(LOADING_IMAGES.map(src => {
       const img = new Image();
       img.src = src;
       return new Promise(res => { img.onload = res; img.onerror = res; });
     })).then(() => {
       setPreloaded(true);
     });
-  }, [images]);
+  }, []);
 
   useEffect(() => {
     if (!preloaded) return;
 
     const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % images.length);
+      setIndex((prev) => (prev + 1) % LOADING_IMAGES.length);
     }, 800);
 
     const timer = setTimeout(() => {
@@ -106,7 +106,7 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
       clearInterval(interval);
       clearTimeout(timer);
     };
-  }, [preloaded, onComplete, images.length]);
+  }, [preloaded, onComplete]);
 
   return (
     <motion.div
@@ -126,7 +126,7 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
           >
             <div className="w-full h-full rounded-3xl overflow-hidden border border-black/5 dark:border-white/10 shadow-2xl">
               <img 
-                src={images[index]} 
+                src={LOADING_IMAGES[index]} 
                 alt="Loading Artifact" 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
@@ -1389,6 +1389,7 @@ export default function App() {
   });
 
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const handleLoadingComplete = useCallback(() => setIsLoading(false), []);
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
@@ -1417,7 +1418,7 @@ export default function App() {
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
       <AnimatePresence mode="wait">
-        {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
+        {isLoading && <LoadingScreen onComplete={handleLoadingComplete} />}
       </AnimatePresence>
 
       <div className={`min-h-screen bg-white dark:bg-black text-zinc-600 dark:text-zinc-200 selection:bg-accent selection:text-white font-sans antialiased transition-colors duration-500`}>

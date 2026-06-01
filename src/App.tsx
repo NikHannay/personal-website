@@ -71,42 +71,29 @@ interface Project {
 // --- Components ---
 
 const LOADING_IMAGES = [
-  "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773612997494-EMITZN383YFD1ZI1MSN6/image-asset.png?format=1500w",
-  "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613052086-D4L95UKDORG97YBVR61N/image-asset.jpg?format=1500w",
+  "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773612997494-EMITZN383YFD1ZI1MSN6/image-asset.png?format=500w",
+  "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613052086-D4L95UKDORG97YBVR61N/image-asset.jpg?format=500w",
   "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/Elevate%20design%20system.jpeg",
-  "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773614988387-QOQYTT9YYGO258UDAM4P/image-asset.png?format=1500w"
+  "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773614988387-QOQYTT9YYGO258UDAM4P/image-asset.png?format=500w"
 ];
 
 const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
   const [index, setIndex] = useState(0);
-  const [preloaded, setPreloaded] = useState(false);
 
   useEffect(() => {
-    Promise.all(LOADING_IMAGES.map(src => {
-      const img = new Image();
-      img.src = src;
-      return new Promise(res => { img.onload = res; img.onerror = res; });
-    })).then(() => {
-      setPreloaded(true);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!preloaded) return;
-
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % LOADING_IMAGES.length);
     }, 800);
 
     const timer = setTimeout(() => {
       onComplete();
-    }, 3500);
+    }, 2500);
 
     return () => {
       clearInterval(interval);
       clearTimeout(timer);
     };
-  }, [preloaded, onComplete]);
+  }, [onComplete]);
 
   return (
     <motion.div

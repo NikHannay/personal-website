@@ -282,11 +282,9 @@ const Hero = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   
-  // Helper to detect touch devices
-  const isTouchDevice = () => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia("(hover: none)").matches;
-  };
+  const isTouch = useRef(
+    typeof window !== 'undefined' && window.matchMedia("(hover: none)").matches
+  );
   
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -303,7 +301,7 @@ const Hero = () => {
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   useEffect(() => {
-    if (isTouchDevice()) return;
+    if (isTouch.current) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       if (!containerRef.current) return;
@@ -348,7 +346,7 @@ const Hero = () => {
         />
 
         {/* Ripple Rings */}
-        {!isTouchDevice() && [0, 1, 2].map((i) => (
+        {!isTouch.current && [0, 1, 2].map((i) => (
           <motion.div
             key={i}
             className="absolute rounded-full border border-accent/30 dark:border-accent/40"
@@ -633,6 +631,7 @@ const ProjectCard = ({ title, category, image, tags, onClick, index }: { title: 
       <img 
         src={image} 
         alt={title}
+        loading="lazy"
         className="w-full h-full object-cover transition-transform duration-1000 ease-[0.16, 1, 0.3, 1] group-hover:scale-110 group-hover:opacity-90"
         referrerPolicy="no-referrer"
       />
@@ -748,7 +747,7 @@ const Work = ({ onProjectClick }: { onProjectClick: (_p: Project) => void }) => 
     {
       title: "Serendata Insight",
       category: "Enterprise SaaS",
-      image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773612997494-EMITZN383YFD1ZI1MSN6/image-asset.png?format=1500w",
+      image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773612997494-EMITZN383YFD1ZI1MSN6/image-asset.png?format=500w",
       tags: ["SaaS", "Branding", "AI"],
       description: "Serendata Insight is a comprehensive SaaS platform designed to provide deep analytics and strategic insights for enterprise clients. The project involved creating a cohesive brand identity, mapping complex user flows, and crafting a high-performance UI that handles massive data sets with ease.",
       details: [
@@ -773,7 +772,7 @@ const Work = ({ onProjectClick }: { onProjectClick: (_p: Project) => void }) => 
     {
       title: "The Learning Hub",
       category: "Product Design",
-      image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613052086-D4L95UKDORG97YBVR61N/image-asset.jpg?format=1500w",
+      image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613052086-D4L95UKDORG97YBVR61N/image-asset.jpg?format=500w",
       tags: ["EdTech", "UX", "Mobile"],
       description: "A mobile-ready online learning platform called The Learning Hub, enabling employees to access resources from multiple sources, complete personal capability assessments and connect with mentors within the business.",
       details: [
@@ -793,7 +792,7 @@ const Work = ({ onProjectClick }: { onProjectClick: (_p: Project) => void }) => 
     {
       title: "Zenith Wellbeing",
       category: "Branding",
-      image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613542750-CR6YHJZKYKT8T38PY4Y2/image-asset.png?format=1500w",
+      image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613542750-CR6YHJZKYKT8T38PY4Y2/image-asset.png?format=500w",
       tags: ["Identity", "Strategy", "Wellness"],
       description: "Develop a clear and distinctive brand identity with brand DNA for Australian wellbeing start-up Zenith. The brand aims to differentiate the business from its competition, representing an unrivalled yet discrete service.",
       details: [
@@ -813,7 +812,7 @@ const Work = ({ onProjectClick }: { onProjectClick: (_p: Project) => void }) => 
     {
       title: "Digital Platform",
       category: "Website",
-      image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773614988387-QOQYTT9YYGO258UDAM4P/image-asset.png?format=1500w",
+      image: "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773614988387-QOQYTT9YYGO258UDAM4P/image-asset.png?format=500w",
       tags: ["Web", "SaaS", "Product"],
       description: "An easy-to-use Platform to help organisations manage stakeholders, impacts and actions in support of successful, scalable and seamless transformation. The website aimed to showcase the benefits of the Product.",
       details: [

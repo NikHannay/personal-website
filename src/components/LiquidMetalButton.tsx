@@ -25,13 +25,21 @@ export const LiquidMetalButton = ({
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    const el = containerRef.current;
+    if (!el) return;
 
-    const ro = new ResizeObserver(([entry]) => {
-      const rect = entry.target.getBoundingClientRect();
-      setDimensions({ width: rect.width, height: rect.height });
-    });
-    ro.observe(containerRef.current);
+    const measure = () => {
+      const rect = el.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        setDimensions({ width: rect.width, height: rect.height });
+      }
+    };
+
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(el);
+
+    // Double-RAF ensures we measure after the loading screen transition completes
+    requestAnimationFrame(() => requestAnimationFrame(measure));
 
     return () => ro.disconnect();
   }, []);

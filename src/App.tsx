@@ -330,7 +330,13 @@ const Hero = () => {
   }, [mouseX, mouseY]);
 
   return (
-    <section ref={containerRef} className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-10 overflow-hidden bg-white dark:bg-black">
+    <motion.section 
+      ref={containerRef} 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
+      className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-10 overflow-hidden bg-white dark:bg-black"
+    >
       {/* Background Gradients */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-600/10 dark:bg-indigo-600/10 blur-[140px] rounded-full" />
@@ -455,7 +461,7 @@ const Hero = () => {
         </motion.div>
       </motion.div>
 
-    </section>
+    </motion.section>
   );
 };
 
@@ -478,9 +484,12 @@ const FeatureSection = () => {
     const el = containerRef.current;
     if (!el) return;
 
-    const ro = new ResizeObserver(([entry]) => {
-      const { width, height } = entry.contentRect;
-      setDimensions({ width, height });
+    const ro = new ResizeObserver(() => {
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        setDimensions({ width: rect.width, height: rect.height });
+      }
     });
     ro.observe(el);
 
@@ -1416,8 +1425,8 @@ export default function App() {
         
         <Navbar />
         <main>
-          <Hero />
-          <FeatureSection />
+          {!isLoading && <Hero />}
+          {!isLoading && <FeatureSection />}
           <Work onProjectClick={setSelectedProject} />
           <Experience />
           <Testimonials />

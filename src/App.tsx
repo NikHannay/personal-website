@@ -456,6 +456,16 @@ const FeatureSection = () => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isReducedMotion, setIsReducedMotion] = useState(false);
   const [isInView, setIsInView] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.matchMedia("(max-width: 768px)").matches);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -545,7 +555,7 @@ const FeatureSection = () => {
           >
             {/* Mesh Gradient Background */}
             <div className="absolute inset-0 z-0">
-              {dimensions.width > 0 && dimensions.height > 0 && (
+              {!isMobile && dimensions.width > 0 && dimensions.height > 0 && (
                 <MeshGradient
                   width={dimensions.width}
                   height={dimensions.height}

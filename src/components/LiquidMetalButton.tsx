@@ -23,16 +23,6 @@ export const LiquidMetalButton = ({
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<HTMLButtonElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.matchMedia("(max-width: 768px)").matches);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -75,7 +65,7 @@ export const LiquidMetalButton = ({
     >
       {/* 1. Default State: Orange Liquid Metal Outline */}
       <div className="absolute inset-0 z-0">
-        {!isMobile && dimensions.width > 0 && dimensions.height > 0 ? (
+        {dimensions.width > 0 && dimensions.height > 0 && (
           <LiquidMetal
             width={dimensions.width}
             height={dimensions.height}
@@ -92,9 +82,7 @@ export const LiquidMetalButton = ({
             scale={1.5}
             fit="cover"
           />
-        ) : isMobile ? (
-          <div className="w-full h-full bg-gradient-to-r from-orange-500 via-accent to-orange-400" />
-        ) : null}
+        )}
       </div>
 
       {/* 1.1 Aesthetic Overlay for Default State */}
@@ -121,7 +109,7 @@ export const LiquidMetalButton = ({
           isHovered ? "opacity-100" : "opacity-0"
         )}
       >
-        {!isMobile && dimensions.width > 0 && dimensions.height > 0 ? (
+        {dimensions.width > 0 && dimensions.height > 0 && (
           <LiquidMetal
             width={dimensions.width}
             height={dimensions.height}
@@ -138,9 +126,7 @@ export const LiquidMetalButton = ({
             scale={3.0} // Heavily increased to hide any central shape
             fit="cover"
           />
-        ) : isMobile ? (
-          <div className="w-full h-full bg-gradient-to-r from-zinc-300 via-zinc-100 to-zinc-400" />
-        ) : null}
+        )}
       </div>
 
       {/* 4. Button Content */}

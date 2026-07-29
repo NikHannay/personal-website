@@ -297,7 +297,7 @@ const Hero = () => {
     offset: ["start start", "end start"]
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], [0, 200]);
+  const y = useTransform(scrollYProgress, [0, 1], [0, isTouch.current ? 0 : 200]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   useEffect(() => {
@@ -329,60 +329,62 @@ const Hero = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.03)_1px,transparent_1px)] dark:bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
       </div>
 
-      {/* Interactive Ripple Blob */}
-      <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
-        {/* The main glow */}
-        <motion.div 
-          className="absolute w-[600px] h-[600px] rounded-full blur-[100px]"
-          style={{ 
-            x: springX, 
-            y: springY,
-            left: -300,
-            top: -300,
-            background: theme === 'dark' 
-              ? 'radial-gradient(circle, rgba(255, 99, 33, 0.3) 0%, transparent 70%)' 
-              : 'radial-gradient(circle, rgba(255, 99, 33, 0.2) 0%, transparent 70%)',
-          }}
-        />
-
-        {/* Ripple Rings */}
-        {!isTouch.current && [0, 1, 2].map((i) => (
-          <motion.div
-            key={i}
-            className="absolute rounded-full border border-accent/30 dark:border-accent/40"
-            style={{
-              x: springX,
+      {/* Interactive Ripple Blob - Desktop Only */}
+      {!isTouch.current && (
+        <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
+          {/* The main glow */}
+          <motion.div 
+            className="absolute w-[600px] h-[600px] rounded-full blur-[100px]"
+            style={{ 
+              x: springX, 
               y: springY,
-              left: 0,
-              top: 0,
-              translateX: "-50%",
-              translateY: "-50%",
-            }}
-            animate={{
-              width: [0, 600],
-              height: [0, 600],
-              opacity: [0.6, 0],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              delay: i * 1.3,
-              ease: "easeOut",
+              left: -300,
+              top: -300,
+              background: theme === 'dark' 
+                ? 'radial-gradient(circle, rgba(255, 99, 33, 0.3) 0%, transparent 70%)' 
+                : 'radial-gradient(circle, rgba(255, 99, 33, 0.2) 0%, transparent 70%)',
             }}
           />
-        ))}
 
-        {/* Cursor Core */}
-        <motion.div 
-          className="absolute w-2 h-2 rounded-full bg-accent shadow-[0_0_15px_rgba(255,99,33,0.8)]"
-          style={{ 
-            x: springX, 
-            y: springY,
-            left: -4,
-            top: -4,
-          }}
-        />
-      </div>
+          {/* Ripple Rings */}
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className="absolute rounded-full border border-accent/30 dark:border-accent/40"
+              style={{
+                x: springX,
+                y: springY,
+                left: 0,
+                top: 0,
+                translateX: "-50%",
+                translateY: "-50%",
+              }}
+              animate={{
+                width: [0, 600],
+                height: [0, 600],
+                opacity: [0.6, 0],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                delay: i * 1.3,
+                ease: "easeOut",
+              }}
+            />
+          ))}
+
+          {/* Cursor Core */}
+          <motion.div 
+            className="absolute w-2 h-2 rounded-full bg-accent shadow-[0_0_15px_rgba(255,99,33,0.8)]"
+            style={{ 
+              x: springX, 
+              y: springY,
+              left: -4,
+              top: -4,
+            }}
+          />
+        </div>
+      )}
 
       <motion.div 
         style={{ y, opacity }}
@@ -505,7 +507,7 @@ const FeatureSection = () => {
     offset: ["start end", "end start"]
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
+  const y = useTransform(scrollYProgress, [0, 1], [isMobile ? 0 : 100, isMobile ? 0 : -100]);
 
   const features = [
     {
@@ -536,10 +538,12 @@ const FeatureSection = () => {
 
   return (
     <section ref={sectionRef} className="pt-0 pb-20 relative z-10">
-      {/* Progressive blur transition to soften the line as it covers the hero logos */}
+      {/* Progressive transition to soften the line as it covers the hero logos */}
       <div className="absolute top-0 left-0 right-0 h-48 -translate-y-full pointer-events-none z-20">
-        <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-black via-white/50 dark:via-black/50 to-transparent" />
-        <div className="absolute inset-0 backdrop-blur-xl [mask-image:linear-gradient(to_top,black,transparent)]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-black via-white/80 dark:via-black/80 to-transparent" />
+        {!isMobile && (
+          <div className="absolute inset-0 backdrop-blur-xl [mask-image:linear-gradient(to_top,black,transparent)]" />
+        )}
       </div>
       <div className="absolute inset-0 bg-white dark:bg-black -z-10" />
 
@@ -621,13 +625,46 @@ const ProjectCard = ({ title, category, image, tags, onClick, index }: { title: 
     offset: ["start end", "center center"]
   });
 
-  // Stay centered (at offset) for 70% of the scroll journey, then fan out to 0 in the last 30%
-  // On mobile, we disable the x and rotate transforms for performance
-  const x = useTransform(scrollYProgress, [0, 0.7, 1], [isMobile ? 0 : (isLeft ? 60 : -60), isMobile ? 0 : (isLeft ? 60 : -60), 0]);
+  const x = useTransform(scrollYProgress, [0, 0.7, 1], [isLeft ? 60 : -60, isLeft ? 60 : -60, 0]);
   const opacity = useTransform(scrollYProgress, [0, 0.4, 1], [0, 1, 1]);
   const scale = useTransform(scrollYProgress, [0, 0.7, 1], [0.9, 0.9, 1]);
-  const rotate = useTransform(scrollYProgress, [0, 0.7, 1], [isMobile ? 0 : (isLeft ? -2 : 2), isMobile ? 0 : (isLeft ? -2 : 2), 0]);
+  const rotate = useTransform(scrollYProgress, [0, 0.7, 1], [isLeft ? -2 : 2, isLeft ? -2 : 2, 0]);
   const y = useTransform(scrollYProgress, [0, 1], [100, 0]);
+
+  if (isMobile) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="group cursor-pointer"
+        onClick={onClick}
+      >
+        <div className="relative aspect-[16/10] rounded-2xl overflow-hidden border border-black/5 dark:border-white/10 bg-zinc-100 dark:bg-zinc-900 mb-6 shadow-sm">
+          <img 
+            src={image} 
+            alt={title}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover"
+            referrerPolicy="no-referrer"
+          />
+        </div>
+        <div className="flex justify-between items-start">
+          <div>
+            <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.2em] mb-2">{category}</p>
+            <h3 className="text-2xl font-serif font-normal text-black dark:text-white">{title}</h3>
+          </div>
+          <div className="flex gap-2">
+            {tags.map(tag => (
+              <span key={tag} className="px-2 py-1 rounded bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-[9px] font-mono text-zinc-500 uppercase">{tag}</span>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div 
@@ -637,33 +674,34 @@ const ProjectCard = ({ title, category, image, tags, onClick, index }: { title: 
       className="group cursor-pointer"
       onClick={onClick}
     >
-    <div className="relative aspect-[16/10] rounded-2xl overflow-hidden border border-black/5 dark:border-white/10 bg-zinc-100 dark:bg-zinc-900 mb-6 shadow-sm hover:shadow-xl transition-all duration-700 ease-[0.16, 1, 0.3, 1]">
-      <img 
-        src={image} 
-        alt={title}
-        loading="lazy"
-        className="w-full h-full object-cover transition-transform duration-1000 ease-[0.16, 1, 0.3, 1] group-hover:scale-110 group-hover:opacity-90"
-        referrerPolicy="no-referrer"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-in-out" />
-      <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-700 ease-[0.16, 1, 0.3, 1] translate-y-2 group-hover:translate-y-0 scale-90 group-hover:scale-100">
-        <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-2xl backdrop-blur-sm">
-          <ArrowRight className="w-5 h-5 text-black -rotate-45" />
+      <div className="relative aspect-[16/10] rounded-2xl overflow-hidden border border-black/5 dark:border-white/10 bg-zinc-100 dark:bg-zinc-900 mb-6 shadow-sm hover:shadow-xl transition-all duration-700 ease-[0.16, 1, 0.3, 1]">
+        <img 
+          src={image} 
+          alt={title}
+          loading="lazy"
+          decoding="async"
+          className="w-full h-full object-cover transition-transform duration-1000 ease-[0.16, 1, 0.3, 1] group-hover:scale-110 group-hover:opacity-90"
+          referrerPolicy="no-referrer"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-in-out" />
+        <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-700 ease-[0.16, 1, 0.3, 1] translate-y-2 group-hover:translate-y-0 scale-90 group-hover:scale-100">
+          <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-2xl backdrop-blur-sm">
+            <ArrowRight className="w-5 h-5 text-black -rotate-45" />
+          </div>
         </div>
       </div>
-    </div>
-    <div className="flex justify-between items-start">
-      <div>
-        <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.2em] mb-2">{category}</p>
-        <h3 className="text-2xl font-serif font-normal text-black dark:text-white group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">{title}</h3>
+      <div className="flex justify-between items-start">
+        <div>
+          <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.2em] mb-2">{category}</p>
+          <h3 className="text-2xl font-serif font-normal text-black dark:text-white group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">{title}</h3>
+        </div>
+        <div className="flex gap-2">
+          {tags.map(tag => (
+            <span key={tag} className="px-2 py-1 rounded bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-[9px] font-mono text-zinc-500 uppercase">{tag}</span>
+          ))}
+        </div>
       </div>
-      <div className="flex gap-2">
-        {tags.map(tag => (
-          <span key={tag} className="px-2 py-1 rounded bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-[9px] font-mono text-zinc-500 uppercase">{tag}</span>
-        ))}
-      </div>
-    </div>
-  </motion.div>
+    </motion.div>
   );
 };
 

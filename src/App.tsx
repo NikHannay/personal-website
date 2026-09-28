@@ -25,7 +25,7 @@ import {
   ChevronRight,
   Quote
 } from "lucide-react";
-import { useRef, useState, useEffect, createContext, useContext, useCallback } from "react";
+import { useRef, useState, useEffect, createContext, useContext } from "react";
 
 import { MeshGradient } from "@paper-design/shaders-react";
 import { LiquidMetalButton } from "./components/LiquidMetalButton";
@@ -48,6 +48,7 @@ interface ProjectDetail {
 interface ProjectVisual {
   type: 'image' | 'video';
   url: string;
+  poster?: string;
   caption?: string;
 }
 
@@ -70,59 +71,37 @@ interface Project {
 
 // --- Components ---
 
-const LOADING_IMAGES = [
-  "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773612997494-EMITZN383YFD1ZI1MSN6/image-asset.png?format=500w",
-  "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773613052086-D4L95UKDORG97YBVR61N/image-asset.jpg?format=500w",
-  "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/Elevate%20design%20system.jpeg",
-  "https://images.squarespace-cdn.com/content/v1/54a68da3e4b0c309d017934f/1773614988387-QOQYTT9YYGO258UDAM4P/image-asset.png?format=500w"
-];
-
-const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
-  const [index, setIndex] = useState(0);
+// Plays only while on screen; fetches metadata/poster only until then.
+const LazyVideo = ({ src, poster }: { src: string; poster?: string }) => {
+  const ref = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % LOADING_IMAGES.length);
-    }, 800);
-
-    const timer = setTimeout(() => {
-      onComplete();
-    }, 2500);
-
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timer);
-    };
-  }, [onComplete]);
+    const el = ref.current;
+    if (!el) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !reduce) {
+        el.play().catch(() => {});
+      } else {
+        el.pause();
+      }
+    }, { threshold: 0.4 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <motion.div
-      initial={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } }}
-      className="fixed inset-0 z-[200] bg-white dark:bg-black flex items-center justify-center overflow-hidden"
-    >
-      <div className="relative w-full max-w-2xl aspect-video px-6">
-        <AnimatePresence mode="popLayout">
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
-            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-            exit={{ opacity: 0, scale: 1.05, filter: "blur(10px)" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute inset-0 flex items-center justify-center p-6"
-          >
-            <div className="w-full h-full rounded-3xl overflow-hidden border border-black/5 dark:border-white/10 shadow-2xl">
-              <img 
-                src={LOADING_IMAGES[index]} 
-                alt="Loading Artifact" 
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-    </motion.div>
+    <video
+      ref={ref}
+      src={src}
+      poster={poster}
+      className="w-full h-full object-cover"
+      controls
+      muted
+      loop
+      playsInline
+      preload="none"
+    />
   );
 };
 
@@ -319,13 +298,13 @@ const Hero = () => {
       ref={containerRef} 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-      className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-10 overflow-hidden bg-white dark:bg-black"
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="relative min-h-svh flex flex-col items-center justify-center pt-32 pb-10 overflow-hidden bg-white dark:bg-black"
     >
       {/* Background Gradients */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-600/10 dark:bg-indigo-600/10 blur-[140px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-emerald-600/10 dark:bg-emerald-600/10 blur-[140px] rounded-full" />
+        <div className="absolute top-[-20%] left-[-10%] w-[90%] h-[90%] bg-[radial-gradient(closest-side,rgba(79,70,229,0.16),transparent)]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[80%] h-[80%] bg-[radial-gradient(closest-side,rgba(5,150,105,0.16),transparent)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.03)_1px,transparent_1px)] dark:bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
       </div>
 
@@ -333,7 +312,7 @@ const Hero = () => {
       <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
         {/* The main glow */}
         <motion.div 
-          className="absolute w-[600px] h-[600px] rounded-full blur-[100px]"
+          className="absolute w-[600px] h-[600px] rounded-full hidden md:block"
           style={{ 
             x: springX, 
             y: springY,
@@ -456,7 +435,7 @@ const FeatureSection = () => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isReducedMotion, setIsReducedMotion] = useState(false);
   const [isInView, setIsInView] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.matchMedia("(max-width: 768px)").matches);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -538,7 +517,7 @@ const FeatureSection = () => {
   return (
     <section ref={sectionRef} className="pt-0 pb-20 relative z-10">
       {/* Progressive blur transition to soften the line as it covers the hero logos */}
-      <div className="absolute top-0 left-0 right-0 h-48 -translate-y-full pointer-events-none z-20">
+      <div className="hidden md:block absolute top-0 left-0 right-0 h-48 -translate-y-full pointer-events-none z-20">
         <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-black via-white/50 dark:via-black/50 to-transparent" />
         <div className="absolute inset-0 backdrop-blur-xl [mask-image:linear-gradient(to_top,black,transparent)]" />
       </div>
@@ -577,7 +556,7 @@ const FeatureSection = () => {
               <motion.div 
                 key={i} 
                 whileHover="hover"
-                className="p-10 bg-white/70 dark:bg-black/70 hover:bg-zinc-50/80 dark:hover:bg-zinc-950/80 backdrop-blur-[2px] transition-colors group relative z-20"
+                className="p-10 bg-white/70 dark:bg-black/70 hover:bg-zinc-50/80 dark:hover:bg-zinc-950/80 md:backdrop-blur-[2px] transition-colors group relative z-20"
               >
                 <motion.div 
                   variants={{
@@ -606,7 +585,7 @@ const FeatureSection = () => {
 const ProjectCard = ({ title, category, image, tags, onClick, index }: { title: string, category: string, image: string, tags: string[], onClick: () => void, index: number }) => {
   const isLeft = index % 2 === 0;
   const cardRef = useRef(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.matchMedia("(max-width: 768px)").matches);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -633,8 +612,8 @@ const ProjectCard = ({ title, category, image, tags, onClick, index }: { title: 
   return (
     <motion.div 
       ref={cardRef}
-      style={{ x, opacity, scale, rotate, y }}
-      whileHover={{ y: -12, scale: 1.01, transition: { duration: 0.4 } }}
+      style={isMobile ? undefined : { x, opacity, scale, rotate, y }}
+      whileHover={isMobile ? undefined : { y: -12, scale: 1.01, transition: { duration: 0.4 } }}
       className="group cursor-pointer"
       onClick={onClick}
     >
@@ -673,7 +652,7 @@ const Work = ({ onProjectClick }: { onProjectClick: (_p: Project) => void }) => 
     {
       title: "NAB: Unifying design at enterprise scale",
       category: "Design System",
-      image: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/Elevate%20design%20system.jpeg",
+      image: "/media/elevate-design-system.webp",
       tags: ["Design Systems", "Enterprise"],
       description: "Design Director · National Australia Bank · Digital, Data & AI\n\nWhen I joined the Elevate design system program at NAB, the scale of the problem was immediately clear. Across one of Australia's largest banks, serving 8.5 million customers, product teams had been solving the same design problems independently for years. The result was 65 distinct onboarding pathways, several component libraries (some nearly a decade old), and a design environment where a single change to a progress indicator could take days to resolve across dozens of files. Inconsistency wasn't just a craft problem. In a regulated financial environment, it was a compliance risk.\n\nThe strategic directive from our Chief Design Officer was simple: one way to do any one thing. My role was to make that real.",
       details: [
@@ -683,12 +662,14 @@ const Work = ({ onProjectClick }: { onProjectClick: (_p: Project) => void }) => 
           visuals: [
             {
               type: 'video',
-              url: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/NAB%20machines%20in%20action_1080p.mp4",
+              url: "/media/machines-in-action.mp4",
+              poster: "/media/machines-in-action-poster.webp",
               caption: "Architecture: The evolution from Shells to Machines to Molecules"
             },
             {
               type: 'video',
-              url: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/NAB%20reusable%20components_1080p.mp4",
+              url: "/media/reusable-components.mp4",
+              poster: "/media/reusable-components-poster.webp",
               caption: "The core Elevate design system component library"
             }
           ]
@@ -699,12 +680,13 @@ const Work = ({ onProjectClick }: { onProjectClick: (_p: Project) => void }) => 
           visuals: [
             {
               type: 'image',
-              url: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/White-label%20brands.jpg",
+              url: "/media/white-label-brands.webp",
               caption: "Multi-brand scaling: White-labeling via token-driven Figma Variables"
             },
             {
               type: 'video',
-              url: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/NAB%20token%20swap%20and%20themeing_1080p.mp4",
+              url: "/media/token-swap-theming.mp4",
+              poster: "/media/token-swap-theming-poster.webp",
               caption: "Tokens in action: Real-time brand switching across the portfolio"
             }
           ]
@@ -715,12 +697,12 @@ const Work = ({ onProjectClick }: { onProjectClick: (_p: Project) => void }) => 
           visuals: [
             {
               type: 'image',
-              url: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/Dev%20Mode%20screen.jpeg",
+              url: "/media/dev-mode-screen.webp",
               caption: "Developer inspection: Bridging the gap with logic-bearing components in Figma"
             },
             {
               type: 'image',
-              url: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/Dev%20Mode%20spacing.jpg",
+              url: "/media/dev-mode-spacing.webp",
               caption: "Precision handoff: Token-driven spacing and layout inspection"
             }
           ]
@@ -731,7 +713,8 @@ const Work = ({ onProjectClick }: { onProjectClick: (_p: Project) => void }) => 
           visuals: [
             {
               type: 'video',
-              url: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/NAB%20homepage_1080p.mp4",
+              url: "/media/homepage.mp4",
+              poster: "/media/homepage-poster.webp",
               caption: "The unified onboarding experience in action"
             }
           ]
@@ -742,7 +725,7 @@ const Work = ({ onProjectClick }: { onProjectClick: (_p: Project) => void }) => 
           visuals: [
             {
               type: 'image',
-              url: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/elevate/Elevate%20design%20system.jpeg",
+              url: "/media/elevate-design-system.webp",
               caption: "The roadmap for Elevate: From design system to design platform"
             }
           ]
@@ -930,7 +913,7 @@ const Experience = () => {
           </div>
           
           <div className="lg:col-span-5 space-y-6">
-            <div className="p-8 rounded-3xl bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5 backdrop-blur-sm">
+            <div className="p-8 rounded-3xl bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5">
               <h4 className="text-black dark:text-white font-serif font-normal text-lg mb-6 flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center">
                   <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -953,7 +936,7 @@ const Experience = () => {
               </div>
             </div>
 
-            <div className="p-8 rounded-3xl bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5 backdrop-blur-sm">
+            <div className="p-8 rounded-3xl bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5">
               <h4 className="text-black dark:text-white font-serif font-normal text-lg mb-6 flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-indigo-500/10 dark:bg-indigo-500/20 flex items-center justify-center">
                   <Globe className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
@@ -980,13 +963,13 @@ const Testimonials = () => {
       quote: "Nik has the rare combination of strategic clarity and hands-on craft. He leads by example, sets a high bar for quality, and consistently turns complexity into simple, scalable solutions.",
       author: "Lance Thornswood",
       role: "Chief Design Officer, National Australia Bank (NAB)",
-      avatar: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/Lance_T.jpeg"
+      avatar: "/media/lance-t.webp"
     },
     {
       quote: "What truly sets Nik apart is his strong leadership skills. He has a unique ability to inspire and motivate the team. He is a great communicator and always ensured that the design team was aligned with the project's objectives.",
       author: "Anthony Choren",
       role: "Senior Product Designer, Once For All (OFA)",
-      avatar: "https://raw.githubusercontent.com/NikHannay/personal-website/main/src/images/Anthony_C.jpeg"
+      avatar: "/media/anthony-c.webp"
     }
   ];
 
@@ -1031,7 +1014,7 @@ const Testimonials = () => {
                     damping: 25,
                     mass: 0.8
                   }}
-                  className="bg-zinc-50/50 dark:bg-zinc-900/40 border border-black/10 dark:border-white/10 rounded-[2rem] p-8 md:p-12 relative overflow-hidden backdrop-blur-sm shadow-sm w-full max-w-[720px] min-h-[320px] flex flex-col justify-center"
+                  className="bg-zinc-50/50 dark:bg-zinc-900/40 border border-black/10 dark:border-white/10 rounded-[2rem] p-8 md:p-12 relative overflow-hidden shadow-sm w-full max-w-[720px] min-h-[320px] flex flex-col justify-center"
                 >
                   <div className="absolute top-8 left-8 opacity-[0.04] dark:opacity-[0.08]">
                     <Quote className="w-12 h-12 text-black dark:text-white" />
@@ -1110,7 +1093,7 @@ const Testimonials = () => {
 const Footer = () => {
   return (
     <footer id="contact" className="py-20 bg-white dark:bg-black relative overflow-hidden">
-      <div className="absolute bottom-0 right-0 w-[50%] h-[50%] bg-indigo-600/5 dark:bg-indigo-600/5 blur-[120px] rounded-full -z-10" />
+      <div className="absolute bottom-0 right-0 w-[70%] h-[70%] bg-[radial-gradient(closest-side,rgba(79,70,229,0.08),transparent)] -z-10" />
       
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
@@ -1167,7 +1150,7 @@ const ProjectModal = ({ project, onClose }: { project: Project | null, onClose: 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10 bg-black/90 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10 bg-black/90 md:backdrop-blur-sm"
       onClick={onClose}
     >
       <motion.div 
@@ -1241,15 +1224,7 @@ const ProjectModal = ({ project, onClose }: { project: Project | null, onClose: 
                                         loading="lazy"
                                       />
                                     ) : (
-                                      <video 
-                                        src={visual.url} 
-                                        className="w-full h-full object-cover" 
-                                        controls 
-                                        muted 
-                                        loop 
-                                        autoPlay 
-                                        playsInline
-                                      />
+                                      <LazyVideo src={visual.url} poster={visual.poster} />
                                     )}
                                   </div>
                                 ) : (
@@ -1298,15 +1273,7 @@ const ProjectModal = ({ project, onClose }: { project: Project | null, onClose: 
                                   loading="lazy"
                                 />
                               ) : (
-                                <video 
-                                  src={visual.url} 
-                                  className="w-full h-full object-cover" 
-                                  controls 
-                                  muted 
-                                  loop 
-                                  autoPlay 
-                                  playsInline
-                                />
+                                <LazyVideo src={visual.url} poster={visual.poster} />
                               )}
                             </div>
                           ) : (
@@ -1376,7 +1343,6 @@ const ProjectModal = ({ project, onClose }: { project: Project | null, onClose: 
 };
 
 export default function App() {
-  const [isLoading, setIsLoading] = useState(true);
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('theme');
@@ -1386,7 +1352,6 @@ export default function App() {
   });
 
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const handleLoadingComplete = useCallback(() => setIsLoading(false), []);
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
@@ -1405,26 +1370,18 @@ export default function App() {
 
   // Prevent scroll when modal is open
   useEffect(() => {
-    if (selectedProject) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    document.body.style.overflow = selectedProject ? 'hidden' : '';
   }, [selectedProject]);
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <AnimatePresence mode="wait">
-        {isLoading && <LoadingScreen onComplete={handleLoadingComplete} />}
-      </AnimatePresence>
-
-      <div className={`min-h-screen bg-white dark:bg-black text-zinc-600 dark:text-zinc-200 selection:bg-accent selection:text-white font-sans antialiased transition-colors duration-500`}>
+      <div className={`min-h-svh bg-white dark:bg-black text-zinc-600 dark:text-zinc-200 selection:bg-accent selection:text-white font-sans antialiased transition-colors duration-500`}>
         {/* Custom Cursor or Grid Overlay could go here */}
         
         <Navbar />
         <main>
-          {!isLoading && <Hero />}
-          {!isLoading && <FeatureSection />}
+          <Hero />
+          <FeatureSection />
           <Work onProjectClick={setSelectedProject} />
           <Experience />
           <Testimonials />

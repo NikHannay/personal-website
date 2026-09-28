@@ -23,6 +23,30 @@ export const LiquidMetalButton = ({
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<HTMLButtonElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  // Shaders only run on fine-pointer devices without reduced motion. Everything else gets a static gradient.
+  const [useShader, setUseShader] = useState(false);
+  const [inView, setInView] = useState(false);
+  const [everInView, setEverInView] = useState(false);
+  const [everHovered, setEverHovered] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)");
+    const update = () => setUseShader(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => {
+      setInView(entry.isIntersecting);
+      if (entry.isIntersecting) setEverInView(true);
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -49,7 +73,7 @@ export const LiquidMetalButton = ({
       ref={containerRef}
       type={type}
       disabled={disabled}
-      onMouseEnter={() => !disabled && setIsHovered(true)}
+      onMouseEnter={() => { if (!disabled) { setIsHovered(true); setEverHovered(true); } }}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}
       className={cn(
@@ -65,7 +89,10 @@ export const LiquidMetalButton = ({
     >
       {/* 1. Default State: Orange Liquid Metal Outline */}
       <div className="absolute inset-0 z-0">
-        {dimensions.width > 0 && dimensions.height > 0 && (
+        {!useShader && (
+          <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, #FF6321 0%, #FFD2B2 50%, #FF6321 100%)" }} />
+        )}
+        {useShader && everInView && dimensions.width > 0 && dimensions.height > 0 && (
           <LiquidMetal
             width={dimensions.width}
             height={dimensions.height}
@@ -78,7 +105,7 @@ export const LiquidMetalButton = ({
             distortion={0.2}
             contour={0.5}
             angle={45}
-            speed={1.5}
+            speed={inView ? 1.5 : 0}
             scale={1.5}
             fit="cover"
           />
@@ -109,7 +136,7 @@ export const LiquidMetalButton = ({
           isHovered ? "opacity-100" : "opacity-0"
         )}
       >
-        {dimensions.width > 0 && dimensions.height > 0 && (
+        {useShader && everHovered && dimensions.width > 0 && dimensions.height > 0 && (
           <LiquidMetal
             width={dimensions.width}
             height={dimensions.height}
@@ -122,7 +149,7 @@ export const LiquidMetalButton = ({
             distortion={0.08}
             contour={0.3}
             angle={25}
-            speed={1.5}
+            speed={isHovered ? 1.5 : 0}
             scale={3.0} // Heavily increased to hide any central shape
             fit="cover"
           />

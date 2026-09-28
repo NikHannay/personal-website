@@ -476,6 +476,7 @@ const FeatureSection = () => {
   }, []);
 
   useEffect(() => {
+    if (isMobile) return;
     const el = containerRef.current;
     if (!el) return;
 
@@ -498,7 +499,7 @@ const FeatureSection = () => {
       ro.disconnect();
       observer.disconnect();
     };
-  }, []);
+  }, [isMobile]);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,

@@ -90,7 +90,7 @@ export const LiquidMetalButton = ({
       {/* 1. Default State: Orange Liquid Metal Outline */}
       <div className="absolute inset-0 z-0">
         {!useShader && (
-          <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, #FF6321 0%, #FFD2B2 50%, #FF6321 100%)" }} />
+          <div className="absolute inset-0 liquid-fallback" />
         )}
         {useShader && everInView && dimensions.width > 0 && dimensions.height > 0 && (
           <LiquidMetal

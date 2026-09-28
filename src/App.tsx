@@ -435,7 +435,7 @@ const FeatureSection = () => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isReducedMotion, setIsReducedMotion] = useState(false);
   const [isInView, setIsInView] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.matchMedia("(max-width: 768px)").matches);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -585,7 +585,7 @@ const FeatureSection = () => {
 const ProjectCard = ({ title, category, image, tags, onClick, index }: { title: string, category: string, image: string, tags: string[], onClick: () => void, index: number }) => {
   const isLeft = index % 2 === 0;
   const cardRef = useRef(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.matchMedia("(max-width: 768px)").matches);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -612,8 +612,8 @@ const ProjectCard = ({ title, category, image, tags, onClick, index }: { title: 
   return (
     <motion.div 
       ref={cardRef}
-      style={{ x, opacity, scale, rotate, y }}
-      whileHover={{ y: -12, scale: 1.01, transition: { duration: 0.4 } }}
+      style={isMobile ? undefined : { x, opacity, scale, rotate, y }}
+      whileHover={isMobile ? undefined : { y: -12, scale: 1.01, transition: { duration: 0.4 } }}
       className="group cursor-pointer"
       onClick={onClick}
     >
@@ -1370,11 +1370,7 @@ export default function App() {
 
   // Prevent scroll when modal is open
   useEffect(() => {
-    if (selectedProject) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    document.body.style.overflow = selectedProject ? 'hidden' : '';
   }, [selectedProject]);
 
   return (

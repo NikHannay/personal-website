@@ -410,8 +410,8 @@ const Hero = () => {
             {[
               { name: "McLaren", domain: "mclaren.com", simpleSlug: "mclaren", className: "h-[120px]" },
               { name: "Vodafone", domain: "vodafone.com", simpleSlug: "vodafone", className: "h-10" },
-              { name: "Jaguar Land Rover", domain: "jaguarlandrover.com", simpleSlug: "jaguar", className: "h-10" },
-              { name: "NAB", domain: "nab.com.au", simpleSlug: "nab", className: "h-10" }
+              { name: "Jaguar Land Rover", domain: "jaguarlandrover.com", simpleSlug: "jaguar", className: "h-10", initialSrc: "/media/jlr-logo.svg" },
+              { name: "NAB", domain: "nab.com.au", simpleSlug: "nab", className: "h-10", initialSrc: "/media/nab-logo.svg" }
             ].map((brand) => (
               <BrandLogo 
                 key={brand.name} 
@@ -419,6 +419,7 @@ const Hero = () => {
                 domain={brand.domain} 
                 simpleSlug={brand.simpleSlug} 
                 className={brand.className}
+                initialSrc={brand.initialSrc}
               />
             ))}
           </motion.div>

@@ -372,7 +372,7 @@ const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-[11px] font-mono uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 mb-10">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-[11px] font-sans font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 mb-10">
             Design at enterprise scale
           </div>
           
@@ -381,7 +381,7 @@ const Hero = () => {
             <span className="text-accent italic">Design Leader.</span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-zinc-600 dark:text-zinc-400 max-w-3xl mx-auto mb-14 leading-relaxed font-light">
+          <p className="text-xl md:text-2xl text-zinc-600 dark:text-zinc-400 max-w-3xl mx-auto mb-14 leading-relaxed tracking-[-0.25px] font-light">
             I operate at the intersection of <span className="text-black dark:text-white font-normal">product, systems, and AI</span>. Helping companies move faster, scale smarter and turn complexity into competitive advantage.
           </p>
           
@@ -390,7 +390,7 @@ const Hero = () => {
               Explore Projects
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </LiquidMetalButton>
-            <div className="flex items-center gap-4 text-zinc-400 dark:text-zinc-500 font-mono text-xs uppercase tracking-widest">
+            <div className="flex items-center gap-4 text-zinc-400 dark:text-zinc-500 font-sans text-xs uppercase tracking-widest">
               <span>Scroll to explore</span>
               <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-800" />
               <div className="flex gap-1">
